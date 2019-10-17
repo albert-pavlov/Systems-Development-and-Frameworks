@@ -14,7 +14,9 @@
 <script>
 export default {
   name: "list-item",
-  props: ["item"],
+  props: {
+    item: Object
+  },
   methods: {
     editModeStart() {
       this.message = "";

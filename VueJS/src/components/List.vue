@@ -16,7 +16,9 @@ export default {
   components: {
     "list-item": ListItem
   },
-  props: ["items"]
+  props: {
+    items: Array
+  }
 };
 </script>
 
