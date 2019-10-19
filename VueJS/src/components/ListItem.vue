@@ -29,7 +29,7 @@ export default {
       e.preventDefault();
       if (this.message !== "") {
         this.editMode = false;
-        this.$emit("edit-item", this.$props.item.id, this.message);
+        this.$emit("edit-item", this.todo);
       }
     },
     deleteItem() {
