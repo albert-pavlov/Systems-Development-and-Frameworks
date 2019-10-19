@@ -38,7 +38,6 @@ export default {
       if (this.message !== "") {
         this.editMode = false;
         this.item.message = this.message;
-        this.$emit("edit-item", this.item);
       }
     },
     deleteItem() {

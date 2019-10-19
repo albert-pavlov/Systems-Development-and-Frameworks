@@ -3,7 +3,6 @@
     Hello Vue.js!
     <list 
     v-bind:items="todos" 
-    v-on:edit-item="editItem" 
     v-on:delete-item="deleteItem" />
   </div>
 </template>
@@ -26,9 +25,6 @@ export default {
     };
   },
   methods: {
-    editItem(item) {
-      this.todos = this.todos.map(todo => todo.id === item.id ? item : todo);
-    },
     deleteItem(item) {
       this.todos = this.todos.filter(todo => todo.id !== item.id);
     }
