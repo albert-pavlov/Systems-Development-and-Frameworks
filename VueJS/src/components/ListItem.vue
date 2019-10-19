@@ -33,7 +33,7 @@ export default {
       }
     },
     deleteItem() {
-      this.$emit("delete-item", this.$props.item.id);
+      this.$emit("delete-item", this.item);
     }
   },
   data() {
