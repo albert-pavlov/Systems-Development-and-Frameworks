@@ -19,6 +19,12 @@ export default {
   props: {
     item: Object
   },
+  data() {
+    return {
+      message: "",
+      editMode: false
+    };
+  },
   methods: {
     editModeStart() {
       this.message = this.item.message;
@@ -38,12 +44,6 @@ export default {
     deleteItem() {
       this.$emit("delete-item", this.item);
     }
-  },
-  data() {
-    return {
-      message: "",
-      editMode: false
-    };
   }
 };
 </script>
