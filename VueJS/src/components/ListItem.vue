@@ -5,9 +5,12 @@
       <button @click="editItem">Save</button>
       <button @click="editModeEnd">Cancel</button>
     </form>
-    <p v-if="!editMode">{{item.id}}. {{item.message}}</p>
-    <button @click="editModeStart" v-if="!editMode">Edit</button>
-    <button @click="deleteItem">Delete</button>
+    <template v-if="!editMode">
+      <p>{{item.id}}. {{item.message}}</p>
+      <button @click="editModeStart">Edit</button>
+      <button @click="deleteItem">Delete</button>
+    </template>
+    
   </div>
 </template>
 
@@ -19,7 +22,7 @@ export default {
   },
   methods: {
     editModeStart() {
-      this.message = "";
+      this.message = this.item.message;
       this.editMode = true;
     },
     editModeEnd() {
@@ -29,7 +32,8 @@ export default {
       e.preventDefault();
       if (this.message !== "") {
         this.editMode = false;
-        this.$emit("edit-item", this.todo);
+        this.item.message = this.message;
+        this.$emit("edit-item", this.item);
       }
     },
     deleteItem() {

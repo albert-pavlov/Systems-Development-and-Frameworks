@@ -14,7 +14,7 @@ import List from "./components/List";
 export default {
   name: "app",
   components: { 
-    "list": List
+    List
   },
   data() {
     return {
@@ -26,13 +26,11 @@ export default {
     };
   },
   methods: {
-    editItem(id, message) {
-      this.todos.find(todo => todo.id === id).message = message;
-    editItem(id, editedTodo) {
-      this.todos = this.todos.map(todo => todo.id === editedTodo ? editedTodo : todo);
+    editItem(item) {
+      this.todos = this.todos.map(todo => todo.id === item.id ? item : todo);
     },
-    deleteItem(id) {
-      this.todos = this.todos.filter(todo => todo.id !== id);
+    deleteItem(item) {
+      this.todos = this.todos.filter(todo => todo.id !== item.id);
     }
   }
 };

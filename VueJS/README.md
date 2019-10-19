@@ -1,17 +1,24 @@
-# Exercise \#1
+# vuejs
 
-Implement a simple todo app with VueJS.
+## Project setup
+```
+npm install
+```
 
-Each item in the todo app should:
+### Compiles and hot-reloads for development
+```
+npm run serve
+```
 
-* Edit: display a form to update the todo
-* Save: update the todo and display it
-* Cancel: cancel the form submission
-* Delete: delete the todo
+### Compiles and minifies for production
+```
+npm run build
+```
 
-Here is how the result should look like:
+### Lints and fixes files
+```
+npm run lint
+```
 
-![screencast](./exercise-vuejs.gif)
-
-Use computed properties and events where possible and make use of the component
-composition pattern.
+### Customize configuration
+See [Configuration Reference](https://cli.vuejs.org/config/).
