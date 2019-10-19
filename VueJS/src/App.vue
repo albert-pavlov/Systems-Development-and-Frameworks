@@ -28,6 +28,8 @@ export default {
   methods: {
     editItem(id, message) {
       this.todos.find(todo => todo.id === id).message = message;
+    editItem(id, editedTodo) {
+      this.todos = this.todos.map(todo => todo.id === editedTodo ? editedTodo : todo);
     },
     deleteItem(id) {
       this.todos = this.todos.filter(todo => todo.id !== id);
