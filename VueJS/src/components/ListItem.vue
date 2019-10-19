@@ -10,7 +10,6 @@
       <button @click="editModeStart">Edit</button>
       <button @click="deleteItem">Delete</button>
     </template>
-    
   </div>
 </template>
 
