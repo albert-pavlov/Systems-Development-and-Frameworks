@@ -20,5 +20,10 @@ npm run build
 npm run lint
 ```
 
+### Runs a test with Jest and Vue Test Utils.
+```
+npm run test
+```
+
 ### Customize configuration
 See [Configuration Reference](https://cli.vuejs.org/config/).
