@@ -1,4 +1,4 @@
-/* eslint-disable no-undef */
+
 import { mount } from '@vue/test-utils'
 import ListItem from './ListItem.vue'
 
@@ -8,7 +8,7 @@ describe('ListItem', () => {
             id: "1", 
             message: "Foo" 
         };
-        
+
         const wrapper = mount(ListItem, {
             propsData: {
                 item: dummy
