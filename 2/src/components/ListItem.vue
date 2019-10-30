@@ -6,7 +6,7 @@
       <button id="button-edit-end" @click="editModeEnd">Cancel</button>
     </form>
     <template v-else>
-      <p id="item-description">{{item.id}}. {{item.message}}</p>
+      <p id="item-description">{{item.id}}.{{item.message}}</p>
       <button id="button-edit-start" @click="editModeStart">Edit</button>
       <button id="button-delete" @click="deleteItem">Delete</button>
     </template>
