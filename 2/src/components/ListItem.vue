@@ -28,7 +28,7 @@ export default {
   methods: {
     editModeStart() {
       this.message = this.item.message;
-      this.editMode = true;
+      //this.editMode = true;
     },
     editModeEnd() {
       this.editMode = false;
