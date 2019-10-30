@@ -1,4 +1,3 @@
-
 import { mount } from '@vue/test-utils'
 import ListItem from './ListItem.vue'
 
@@ -8,7 +7,7 @@ describe('ListItem', () => {
             id: "1", 
             message: "Foo" 
         };
-
+        
         const wrapper = mount(ListItem, {
             propsData: {
                 item: dummy
@@ -32,7 +31,7 @@ describe('ListItem', () => {
         describe('testing `Edit` button', () => {
             test('click on button shows input field', () => {
                 wrapper.find('#button-edit-start').trigger('click');
-                expect(wrapper.vm.editMode).toBe(true);
+                expect(wrapper.vm.editMode).toBeTruthy();
                 expect(wrapper.find('#input-edit').exists()).toBeTruthy();
             });
 
@@ -43,9 +42,9 @@ describe('ListItem', () => {
                     id: "1",
                     message: "Edited Message"
                 };
-                expect(wrapper.vm.item).toEqual(editedItem);
-                expect(dummy).toEqual(editedItem);
-                expect(wrapper.vm.editMode).toBe(false);
+                expect(wrapper.vm.item).toBe(editedItem);
+                expect(dummy).toBe(editedItem);
+                expect(wrapper.vm.editMode).toBeFalsy();
                 expect(wrapper.find('#input-edit').exists()).toBeFalsy();
             });
         });
