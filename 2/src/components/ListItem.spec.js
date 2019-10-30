@@ -16,7 +16,7 @@ describe('ListItem', () => {
         });
 
         test('init with dummy parameter', () => {
-            expect(wrapper.vm.item).toBe(dummy);
+            expect(wrapper.vm.item).toEqual(dummy);
         });
 
         test('renders item', () => {
@@ -43,8 +43,8 @@ describe('ListItem', () => {
                     id: "1",
                     message: "Edited Message"
                 };
-                expect(wrapper.vm.item).toBe(editedItem);
-                expect(dummy).toBe(editedItem);
+                expect(wrapper.vm.item).toEqual(editedItem);
+                expect(dummy).toEqual(editedItem);
                 expect(wrapper.vm.editMode).toBeFalsy();
                 expect(wrapper.find('#input-edit').exists()).toBeFalsy();
             });
