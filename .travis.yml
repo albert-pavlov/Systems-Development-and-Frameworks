@@ -5,10 +5,10 @@ branches:
 cache:
   directories:
     - "2/node_modules"
+before_install:
+  - cd "2"
 install:
   - npm install
-before_script:
-  - cd "2"
 script:
   - npm run lint
   - npm run test
