@@ -1,4 +1,3 @@
-/* eslint-disable no-undef */
 import { mount } from '@vue/test-utils'
 import ListItem from './ListItem.vue'
 
