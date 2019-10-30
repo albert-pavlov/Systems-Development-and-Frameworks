@@ -1,4 +1,4 @@
-/* eslint-disable no-undef */
+
 import { mount } from '@vue/test-utils'
 import ListItem from './ListItem.vue'
 
@@ -53,7 +53,7 @@ describe('ListItem', () => {
         describe('testing `Delete` button', () => {
             test('click on button emits delete event', () => {
                 //wrapper.vm.deleteItem();
-                wrapper.find('#button-delete2').trigger('click');
+                wrapper.find('#button-delete').trigger('click');
                 //console.log(wrapper.emitted());
                 var itemToDelete = wrapper.emitted('delete-item')[0][0];
                 //console.log(itemToDelete);
