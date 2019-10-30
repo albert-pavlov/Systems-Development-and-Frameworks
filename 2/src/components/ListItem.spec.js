@@ -1,10 +1,9 @@
+/* eslint-disable no-undef */
 import { mount } from '@vue/test-utils'
 import ListItem from './ListItem.vue'
 
 describe('ListItem', () => {
-
     describe('given an `item`', () => {
-
         const dummy = { 
             id: "1", 
             message: "Foo" 
@@ -31,7 +30,6 @@ describe('ListItem', () => {
         });
 
         describe('testing `Edit` button', () => {
-
             test('click on button shows input field', () => {
                 wrapper.find('#button-edit-start').trigger('click');
                 expect(wrapper.vm.editMode).toBe(true);
@@ -53,7 +51,6 @@ describe('ListItem', () => {
         });
 
         describe('testing `Delete` button', () => {
-
             test('click on button emits delete event', () => {
                 //wrapper.vm.deleteItem();
                 wrapper.find('#button-delete').trigger('click');
