@@ -7,7 +7,3 @@ cache:
 script:
   - npm run lint
   - npm run test
-# safelist
-branches:
-  only:
-  - dev
