@@ -1,10 +1,11 @@
 <template>
   <ul>
-    <li v-for="item in items" v-bind:key="item.id">
       <list-item 
-      v-bind:item="item" 
-      v-on="$listeners" /> <!-- https://stackoverflow.com/a/56172089 -->
-    </li>
+        v-for="item in itemsCopy" 
+        v-bind:key="item.id" 
+        v-bind:item="item" 
+        @delete-item="deleteItem"
+      />
   </ul>
 </template>
 
@@ -17,7 +18,20 @@ export default {
     ListItem
   },
   props: {
-    items: Array
+    items: { 
+      type: Array, 
+      required: true 
+    }, 
+  },
+  data() {
+    return {
+      itemsCopy: this.items
+    }
+  },
+  methods: {
+    deleteItem(item) {
+      this.itemsCopy = this.itemsCopy.filter(i => i.id !== item.id);
+    }
   }
 };
 </script>
