@@ -1,5 +1,7 @@
 # VueJS
 
+[![Build Status](https://travis-ci.org/albert-pavlov/Systems-Development-and-Frameworks.svg?branch=dev)](https://travis-ci.org/albert-pavlov/Systems-Development-and-Frameworks)
+
 ## Project setup
 ```
 npm install

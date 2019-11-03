@@ -5,9 +5,9 @@ branches:
   - dev
 cache:
   directories:
-    - "2/node_modules"
+    - "VueJS/node_modules"
 before_install:
-  - cd "2"
+  - cd "VueJS"
 install:
   - npm install
 script:

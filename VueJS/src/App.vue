@@ -1,9 +1,7 @@
 <template>
   <div id="app">
     Hello Vue.js!
-    <list 
-    v-bind:items="todos" 
-    v-on:delete-item="deleteItem" />
+    <list v-bind:items="todos" />
   </div>
 </template>
 
@@ -23,11 +21,6 @@ export default {
         { id: "3", message: "Baz" }
       ]
     };
-  },
-  methods: {
-    deleteItem(item) {
-      this.todos = this.todos.filter(todo => todo.id !== item.id);
-    }
   }
 };
 </script>

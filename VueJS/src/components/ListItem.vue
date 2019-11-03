@@ -2,7 +2,7 @@
   <div>
     <form v-if="editMode">
       <input id="input-edit" type="text" v-model="message" />
-      <button id="button-save" @click="editItem">Save</button>
+      <button id="button-save" @click.prevent="editItem" :disabled="(message === '')">Save</button>
       <button id="button-edit-end" @click="editModeEnd">Cancel</button>
     </form>
     <template v-else>
@@ -17,28 +17,25 @@
 export default {
   name: "list-item",
   props: {
-    item: Object
+    item: {type: Object, required: true}
   },
   data() {
     return {
-      message: "",
+      message: this.item.message,
       editMode: false
     };
   },
   methods: {
     editModeStart() {
-      this.message = this.item.message;
       //this.editMode = true;
     },
     editModeEnd() {
       this.editMode = false;
     },
-    editItem(e) {
-      e.preventDefault();
-      if (this.message !== "") {
-        this.editMode = false;
-        this.item.message = this.message;
-      }
+    editItem() {
+      if (this.message == "") return;
+      this.editMode = false;
+      this.item.message = this.message;
     },
     deleteItem() {
       this.$emit("delete-item", this.item);
