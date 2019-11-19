@@ -5,6 +5,12 @@ const typeDefs = gql`
         getAllListItems(isDone: Boolean, orderBy: ORDERBY): [ListItem]
     }
 
+    type Mutation {
+        createListItem(message: String!): ListItem
+        finishListItem(id: Int!): ListItem
+        deleteListItem(id: Int!): ListItem
+    }
+
     type ListItem {
         id: Int
         message: String

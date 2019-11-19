@@ -18,12 +18,6 @@ const listItems = [
         createdAt: "1573781400000"
       },
       {
-        id: 3,
-        message: "Foo",
-        isDone: false,
-        createdAt: "1573785000000"
-      },
-      {
         id: 4,
         message: "Bar",
         isDone: false,
