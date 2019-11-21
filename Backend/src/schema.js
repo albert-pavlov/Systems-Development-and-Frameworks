@@ -19,8 +19,8 @@ const typeDefs = gql`
     }
 
     enum ORDERBY {
-        ASC,
-        DESC
+        asc
+        desc
     }
 `;
 

@@ -6,12 +6,17 @@ const ListItem = require("./listItem");
 const resolvers = {
     Query: {        
         getAllListItems: async function(parent, args, context, info) {
-            const allListItems = utils.epochToLocaleDateTimeArr(listItems);
+            let tempListItems = JSON.parse(JSON.stringify(listItems));
+
+            if(utils.ORDERBY.asc === args.orderBy || utils.ORDERBY.desc === args.orderBy) {
+                tempListItems = utils.sortListItemsByOrder(tempListItems, args.orderBy);
+            }
+            const allListItems = tempListItems;            
             const allDoneListItems =
                 (args.isDone == true || args.isDone == false) ?
                     allListItems.filter(listItem => listItem.isDone == args.isDone)
                     : allListItems;
-
+            
             return allDoneListItems;
         }        
     },
@@ -21,9 +26,9 @@ const resolvers = {
                 let listItem = new ListItem(utils.generateRandomId(listItems), args.message, false, ((new Date).getTime()).toString());
                 listItems.push(listItem);
 
-                return utils.epochToLocaleDateTime(listItem);
+                return listItem;
             }
-            return null;
+            return;
         },
         finishListItem: async function(parent, args, context, info) {
             if(typeof(args.id) === 'number' && args.id != null && args.id != undefined) {
@@ -34,7 +39,7 @@ const resolvers = {
                         listItem = listItems[i];
                     }
                 }
-                return listItem != null ? utils.epochToLocaleDateTime(listItem) : null;
+                return listItem != null ?listItem : null;
             }
             return;
         },
@@ -47,10 +52,15 @@ const resolvers = {
                         listItems.splice(i, 1);
                     }
                 }
-                return listItem != null ? utils.epochToLocaleDateTime(listItem) : null;
+                return listItem != null ? listItem : null;
             }
             return;
         }        
+    },
+    ListItem: {
+        createdAt: (parent, args, context, info) => {
+            return new Date(Number(parent.createdAt)).toISOString();
+        }
     }
 };
 
