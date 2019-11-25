@@ -3,17 +3,13 @@ language: generic
 branches:
   only:
   - dev
-cache:
-  directories:
-    - "VueJS/node_modules"
-before_install:
-  - cd ..
 install:
-  - cd "VueJS"
+  - cd VueJS
   - npm install
-  - cd "../Backend"
+  - cd ../Backend
   - npm install
 script:
+  - cd VueJs
   - npm run lint
   - npm run test
   - cd ../Backend
