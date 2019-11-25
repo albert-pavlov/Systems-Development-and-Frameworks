@@ -8,12 +8,14 @@ install:
   - npm install
   - cd ../Backend
   - npm install
+before-script:
+  - cd ..
 script:
-  - cd ../VueJs
+  - cd VueJs
   - npm run lint
   - npm run test
   - cd ../Backend
   - npm test
 after_success:
-  - cd ..
+  - cd VueJS
   - npm run build
