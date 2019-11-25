@@ -12,6 +12,7 @@ install:
 script:
   - pwd
   - cd ..
+  - pwd
   - cd VueJs
   - npm run lint
   - npm run test
