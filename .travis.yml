@@ -9,8 +9,7 @@ install:
   - cd ../Backend
   - npm install
 script:
-  - cd VueJs
-  - pwd
+  - cd ../VueJs
   - npm run lint
   - npm run test
   - cd ../Backend
