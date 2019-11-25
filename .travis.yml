@@ -10,9 +10,11 @@ install:
   - npm install
 script:
   - cd VueJs
+  - pwd
   - npm run lint
   - npm run test
   - cd ../Backend
   - npm test
 after_success:
+  - cd ..
   - npm run build
