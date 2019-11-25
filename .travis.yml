@@ -7,11 +7,16 @@ cache:
   directories:
     - "VueJS/node_modules"
 before_install:
-  - cd "VueJS"
+  - cd ..
 install:
+  - cd ./VueJS
+  - npm install
+  - cd ../Backend
   - npm install
 script:
   - npm run lint
   - npm run test
+  - cd ../Backend
+  - npm test
 after_success:
   - npm run build
