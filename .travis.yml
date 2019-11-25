@@ -9,9 +9,9 @@ cache:
 before_install:
   - cd ..
 install:
-  - cd VueJS
+  - cd "VueJS"
   - npm install
-  - cd ../Backend
+  - cd "../Backend"
   - npm install
 script:
   - npm run lint
