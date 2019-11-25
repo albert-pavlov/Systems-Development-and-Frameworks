@@ -11,7 +11,8 @@ install:
 
 script:
   - pwd
-  - cd ../VueJs
+  - cd ..
+  - cd VueJs
   - npm run lint
   - npm run test
   - cd ../Backend
