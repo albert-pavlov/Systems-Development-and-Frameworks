@@ -14,7 +14,7 @@ script:
   - cd ..
   - pwd
   - ls -l
-  - cd VueJs
+  - cd VueJS
   - npm run lint
   - npm run test
   - cd ../Backend
