@@ -3,7 +3,7 @@ const { createTestClient } = require('apollo-server-testing');
 const { gql } = require('apollo-server');
 const typeDefs = require('./schema');
 const resolvers = require('./resolvers');
-const listItems = require('./database');
+const db = require('./database');
 const utils = require('./utils');
 
 
@@ -183,7 +183,7 @@ describe('query', () => {
         }`
         it('returns a list of some listItems', async () => {
             variables = { }
-            let tempListItems = JSON.parse(JSON.stringify(listItems));
+            let tempListItems = JSON.parse(JSON.stringify(db.listItems));
             tempListItems.forEach(listItem => {
                 listItem.createdAt = new Date(Number(listItem.createdAt)).toISOString()
             })

@@ -14,9 +14,11 @@
     "apollo-server": "^2.9.8",
     "apollo-server-testing": "^2.9.9",
     "eslint": "^6.6.0",
+    "fs": "0.0.1-security",
     "graphql": "^14.5.8",
     "graphql-middleware": "^4.0.2",
     "graphql-shield": "^7.0.2",
-    "jest": "^24.9.0"
+    "jest": "^24.9.0",
+    "jsonwebtoken": "^8.5.1"
   }
 }

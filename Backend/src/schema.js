@@ -6,16 +6,24 @@ const typeDefs = gql`
     }
 
     type Mutation {
-        createListItem(message: String!): ListItem
-        finishListItem(id: Int!): ListItem
-        deleteListItem(id: Int!): ListItem
+        createListItem(message: String!, assigneeID: ID): ListItem
+        finishListItem(id: ID!): ListItem
+        deleteListItem(id: ID!): ListItem
+        createUser(name: String!, pwd: String!): User
+        login(usr: String!, pwd: String!): String!
     }
 
     type ListItem {
-        id: Int
-        message: String
-        isDone: Boolean
-        createdAt: String
+        id: ID!
+        message: String!
+        isDone: Boolean!
+        createdAt: String!
+        assignee: User
+    }
+
+    type User {
+        id: ID!
+        name: String!
     }
 
     enum ORDERBY {

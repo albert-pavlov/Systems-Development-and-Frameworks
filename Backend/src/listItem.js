@@ -1,9 +1,10 @@
 class ListItem {
-    constructor(id, message, isDone, createdAt) {
+    constructor(id, message, isDone, createdAt, user) {
         this.id = id;
         this.message = message;
         this.isDone = isDone;
         this.createdAt = createdAt;
+        this.assignee = user;
     }
 }
 
