@@ -1,8 +1,8 @@
 language: generic
 # safelist
 branches:
-  only:
   - dev
+  - dev_3_gql_shield_middleware
 install:
   - cd VueJS
   - npm install
