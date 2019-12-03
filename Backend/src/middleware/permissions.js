@@ -58,6 +58,7 @@ const isAuthenticated = rule({ cache: 'contextual' })(
 const permissions = shield({
     Query: {
         "*": deny,
+        getOneListItems: isAuthenticated,
         getAllListItems: isAuthenticated
     },
     Mutation: {

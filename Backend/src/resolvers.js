@@ -6,7 +6,12 @@ const jwtService = require('./jwt/service');
 
 
 const resolvers = {
-    Query: {        
+    Query: {
+        getOneListItems: async function(parent, args, context, info) {
+            let tempListItems = JSON.parse(JSON.stringify(db.listItems));
+            
+            return tempListItems.find(listItem => { return listItem.id == args.id});
+        },        
         getAllListItems: async function(parent, args, context, info) {
             let tempListItems = JSON.parse(JSON.stringify(db.listItems));
 
