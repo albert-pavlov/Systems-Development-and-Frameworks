@@ -16,14 +16,6 @@ module.exports = {
   };
   return jwt.sign(payload, privateKEY, signOptions);
 },
-/*
-    let decodedToken = jwtService.decode(token).payload;
-    let vOptions = {
-        issuer: decodedToken.iss,
-        subject: decodedToken.sub, 
-        audience: decodedToken.aud
-        }
-*/
 verify: (token, $Option) => {
     
   var verifyOptions = {

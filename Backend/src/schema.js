@@ -1,10 +1,8 @@
 const { gql } = require('apollo-server');
-const { makeExecutableSchema } = require('graphql-tools');
-
 
 const typeDefs = gql`
     type Query {
-        getOneListItems(id: ID!): ListItemInfo
+        getOneListItem(id: ID!): ListItemInfo
         getAllListItems(isDone: Boolean, orderBy: ORDERBY): [ListItem]
     }
 

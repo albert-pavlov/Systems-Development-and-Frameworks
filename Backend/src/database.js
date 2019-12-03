@@ -44,28 +44,28 @@ const listItems = [
         message: "Baz",
         isDone: false,
         createdAt: "1573781400000",
-        assignee: users[Math.floor(Math.random() * users.length)]
+        assignee: users[2]
       },
       {
         id: 4,
         message: "Bar",
         isDone: false,
         createdAt: "1573788600000",
-        assignee: users[Math.floor(Math.random() * users.length)]
+        assignee: users[3]
       },
       {
         id: 5,
         message: "Bar",
         isDone: true,
         createdAt: "1573792200000",
-        assignee: users[Math.floor(Math.random() * users.length)]
+        assignee: users[3]
       },
       {
         id: 6,
         message: "Foo",
-        isDone: true,
+        isDone: false,
         createdAt: "1573795800000",
-        assignee: users[Math.floor(Math.random() * users.length)]
+        assignee: null
       },
       {
         id: 7,
@@ -86,7 +86,7 @@ const listItems = [
         message: "Bar",
         isDone: false,
         createdAt: "1573806600000",
-        assignee: users[Math.floor(Math.random() * users.length)]
+        assignee: null
       },
       {
         id: 10,
