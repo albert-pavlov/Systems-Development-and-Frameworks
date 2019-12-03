@@ -7,7 +7,7 @@ module.exports = {
                 largestId = arr[i].id;
             }
         }
-        largestId += Math.floor(Math.random() * arr.length);
+        largestId += Math.floor(Math.random() * arr.length+1);
 
         return largestId;
     },

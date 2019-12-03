@@ -30,14 +30,14 @@ const listItems = [
         message: "Foo",
         isDone: false,
         createdAt: "1573774200000",
-        assignee: users[Math.floor(Math.random() * users.length)]
+        assignee: users[0]
       },
       {
         id: 2,
         message: "Bar",
         isDone: true,
         createdAt: "1573777800000",
-        assignee: users[Math.floor(Math.random() * users.length)]
+        assignee: users[1]
       },
       {
         id: 3,

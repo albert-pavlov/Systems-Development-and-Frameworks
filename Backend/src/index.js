@@ -1,10 +1,5 @@
-const { ApolloServer } = require('apollo-server');
+const { getServer } = require('./servers');
 
-const typeDefs = require('./schema');
-const resolvers = require('./resolvers');
-
-const server = new ApolloServer({ typeDefs, resolvers });
-
-server.listen().then(({ url }) => {
+getServer().listen().then(({ url }) => {
   console.log(`Server running at ${url}`);
 });

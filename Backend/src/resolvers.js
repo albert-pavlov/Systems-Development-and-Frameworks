@@ -1,7 +1,7 @@
 const db = require('./database');
 const utils = require('./utils');
-const ListItem = require("./listItem");
-const User = require('./user');
+const { ListItem, ListItemInfo } = require("./listItem");
+const { User, UserInfo } = require('./user');
 const jwtService = require('./jwt/service');
 
 
@@ -36,9 +36,7 @@ const resolvers = {
                     subject: loggedInUser != undefined ? loggedInUser.name : null, 
                     audience: "HTW Alumni"
                    }
-                let token = jwtService.sign({}, sOptions)
-               
-                
+
                 return loggedInUser != undefined ? jwtService.sign({}, sOptions) : "Wrong username and/or password!";
             }
         },
@@ -52,37 +50,57 @@ const resolvers = {
             }
             return;
         },
+        assignListItem: async function(parent, args, context, info) {
+        
+            let listItem = db.listItems.find(listItem => { return listItem.id == args.id});
+            if(listItem != null) {
+                listItem.assignee = db.users.find(usr => { return usr.id == args.assigneeID });
+               
+                return listItem;
+            }
+        },
         finishListItem: async function(parent, args, context, info) {
-            if(typeof(args.id) === 'number' && args.id != null && args.id != undefined) {
-                let listItem;
+                let listItemInfo;
                 for(i = 0; i < db.listItems.length; i++) {
-                    if(db.listItems[i].id === args.id) {
+                    if(db.listItems[i].id == args.id) {
                         db.listItems[i].isDone = true;
                         listItem = db.listItems[i];
+                        listItemInfo = new ListItemInfo(listItem.id, listItem.message, listItem.isDone, listItem.createdAt, listItem.assignee);              
                     }
                 }
-                return listItem != null ?listItem : null;
-            }
-            return;
+                return listItemInfo;
         },
-        deleteListItem: async function(parent, args, context, info) {
-            if(typeof(args.id) === 'number' && args.id != null && args.id != undefined) {
-                let listItem;
-                for(i = 0; i < db.listItems.length; i++) {
-                    if(db.listItems[i].id === args.id) {
-                        listItem = db.listItems[i];                        
-                        db.listItems.splice(i, 1);
-                    }
+        deleteListItem: async function(parent, args, context, info) {           
+            let listItemInfo;
+            for(i = 0; i < db.listItems.length; i++) {
+                if(db.listItems[i].id == args.id) {
+                    listItem = db.listItems[i];  
+                    listItemInfo = new ListItemInfo(listItem.id, listItem.message, listItem.isDone, listItem.createdAt, listItem.assignee);                      
+                    db.listItems.splice(i, 1);
                 }
-                return listItem != null ? listItem : null;
             }
-            return;
+            return listItemInfo;
+            
         },
         createUser: async function(parent, args, context, info) {
+            if(args.name != "" && args.name != null && args.name != undefined && args.pwd != "" && args.pwd != null && args.pwd != undefined) {
+                let user = db.users.find((user) => user.name === args.name); 
+                if(user == null) {
+                    user = new User(utils.generateRandomId(db.users), args.name, args.pwd);
+                    db.users.push(user);
 
+                    return new UserInfo(user.id, user.name);
+                }
+            }
+            return;
         }        
     },
     ListItem: {
+        createdAt: (parent, args, context, info) => {
+            return new Date(Number(parent.createdAt)).toISOString();
+        }
+    },
+    ListItemInfo: {
         createdAt: (parent, args, context, info) => {
             return new Date(Number(parent.createdAt)).toISOString();
         }

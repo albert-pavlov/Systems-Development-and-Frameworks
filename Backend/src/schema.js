@@ -1,4 +1,6 @@
 const { gql } = require('apollo-server');
+const { makeExecutableSchema } = require('graphql-tools');
+
 
 const typeDefs = gql`
     type Query {
@@ -7,9 +9,10 @@ const typeDefs = gql`
 
     type Mutation {
         createListItem(message: String!, assigneeID: ID): ListItem
-        finishListItem(id: ID!): ListItem
-        deleteListItem(id: ID!): ListItem
-        createUser(name: String!, pwd: String!): User
+        assignListItem(id: ID!, assigneeID: ID!): ListItem
+        finishListItem(id: ID!): ListItemInfo
+        deleteListItem(id: ID!): ListItemInfo
+        createUser(name: String!, pwd: String!): UserInfo
         login(usr: String!, pwd: String!): String!
     }
 
@@ -21,7 +24,20 @@ const typeDefs = gql`
         assignee: User
     }
 
+    type ListItemInfo {
+        id: ID!
+        message: String!
+        isDone: Boolean!
+        createdAt: String!
+        assignee: User
+    }
+
     type User {
+        id: ID!
+        name: String!
+    }
+
+    type UserInfo {
         id: ID!
         name: String!
     }
