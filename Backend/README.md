@@ -1,3 +1,4 @@
+
 # Backend
 
 ## Project setup
@@ -12,6 +13,5 @@ npm start
 
 ## Run tests with Jest
 ```
-npm test (not implemented yet)
+npm test
 ```
-
