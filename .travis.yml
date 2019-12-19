@@ -4,6 +4,7 @@ branches:
   - dev_4
 
 install:
+  - cd Backend
   - yarn install
 
 script:
