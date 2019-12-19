@@ -1,7 +1,7 @@
 language: generic
 # safelist
 branches:
-  - dev
+  - dev_4
   - dev_3_gql_shield_middleware
 install:
   - cd VueJS
