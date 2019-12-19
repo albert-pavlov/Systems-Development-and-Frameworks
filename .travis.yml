@@ -1,20 +1,14 @@
 language: generic
-# safelist
+
 branches:
   - dev_4
-  - dev_3_gql_shield_middleware
-install:
-  - cd VueJS
-  - npm install
-  - cd ../Backend
-  - npm install
 
-script:
-  - cd ../VueJS
-  - npm run lint
-  - npm run test
+install:
   - cd ../Backend
-  - npm test
-after_success:
-  - cd VueJS
-  - npm run build
+  - yarn install
+  
+script:
+  - cd ../Backend
+  - yarn run db:reset
+  - yarn run db:seed
+  - yarn run test
