@@ -1,12 +1,10 @@
-require('dotenv').config();
-const { NEO4J_URI, NEO4J_USERNAME, NEO4J_PASSWORD } = process.env;
 const { ApolloServer } = require('apollo-server');
 const typeDefs = require('../schema/schema');
 const resolvers = require('../schema/resolvers');
 const permissions = require('../middleware/permissions');
 const { makeExecutableSchema } = require('graphql-tools');
 const { applyMiddleware } = require('graphql-middleware');
-const getDriver = require("../db/neo4j");
+const { getDriver } = require("../db/neo4j");
 
 const schema = makeExecutableSchema({
   typeDefs: typeDefs,

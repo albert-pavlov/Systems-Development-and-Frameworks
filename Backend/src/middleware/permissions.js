@@ -30,7 +30,7 @@ const isAuthenticated = rule({ cache: 'contextual' })(
             if (decodedToken == null || decodedToken == undefined) {
                 return false;
             }
-            return decodedToken.payload.sub === parent.assignee.name;
+            return decodedToken.payload.sub === (parent.assignee != undefined ? parent.assignee.name : false);
         }
         catch(err){
             console.log(err);

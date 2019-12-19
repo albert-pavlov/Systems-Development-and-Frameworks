@@ -1,6 +1,6 @@
 // https://github.com/Human-Connection/Human-Connection/blob/cf7b5851c3ceedd5fd932f9c475ef152be1b9249/backend/src/seed/reset-db.js
 
-const getDriver = require("./neo4j");
+const { getDriver } = require("./neo4j");
 
 const cleanDatabase = async (options = {}) => {
     const { driver = getDriver() } = options
@@ -17,7 +17,7 @@ const cleanDatabase = async (options = {}) => {
 ;(async function() {
     try {
       await cleanDatabase()
-      console.log('Successfully deleted all nodes and relations!')
+      console.log('\nSuccessfully deleted all nodes and relations!\n')
       process.exit(0)
     } catch (err) {
       console.log(`Error occurred deleting the nodes and relations (reset the db)\n\n${err}`) 

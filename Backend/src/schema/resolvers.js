@@ -19,15 +19,13 @@ const resolvers = {
                     let result = await txc.run(
                         `
                         MATCH (listItem: ListItem { id: $id })
-                        MATCH (user:User)<-[:ASSIGNED]-(listItem)
-                        RETURN listItem, user
+                        RETURN listItem
                          `,
                             { id: Number(args.id) },
                         )
                     if (result != null) {
                         return result.records.map(record => ({
                             listItem: record.get('listItem').properties,
-                            user: record.get('user').properties
                         }))
                     }
                     return;
@@ -35,10 +33,30 @@ const resolvers = {
                 let txResult = await writeTxResultPromise
 
                 listItem = txResult[0] != undefined ? txResult[0].listItem : null;
-                user = txResult[0] != undefined ? txResult[0].user : null;
                 
-                if (listItem != null) {                    
+                if (listItem != null) {
+                    writeTxResultPromise = session.writeTransaction(async txc => {
+                        result = await txc.run(
+                            `
+                        MATCH (listItem: ListItem { id: $id })
+                        MATCH (user:User)<-[:ASSIGNED]-(listItem)
+                        RETURN user
+                         `,
+                            { id: Number(args.id) },
+                        )
+                        if (result != null) {
+                            return result.records.map(record => ({
+                                user: record.get('user') != undefined ? record.get('user').properties : null
+                            }))
+                        }
+                        return;
+                    })
+                    let txResult = await writeTxResultPromise
+
+                    user = txResult[0] != undefined ? txResult[0].user : null;
+
                     listItem.assignee = user;
+                    
                     listItemInfo = new ListItemInfo(listItem);
                 }
                 return listItemInfo;
@@ -49,13 +67,6 @@ const resolvers = {
         getAllListItems: async function(parent, args, context, info) {
             let allListItems = [];
             const session = context.driver.session();
-
-            /*
-                MATCH(allListItems: ListItem)
-                WHERE(allListItems.isDone = false)
-                RETURN allListItems
-                ORDER BY (allListItems.createdAt) ASC
-            */
 
             cypher = 'MATCH(allListItems: ListItem) ';
             if(typeof(args.isDone) === 'boolean') {
@@ -82,7 +93,10 @@ const resolvers = {
                     })
                 }
 
-                
+                allListItems.forEach(listItem => {
+                    listItem.assignee = !null;
+                })
+
                 return allListItems;
             } finally {
                 session.close()
@@ -110,13 +124,12 @@ const resolvers = {
                         )
                         if (result != null) {
                             return result.records.map(record => ({
-                                user: record.get('user').properties
+                                user: record.get('user') != undefined ? record.get('user').properties : null
                             }))
                         }
-                        return;
                     })
                     let txResult = await writeTxResultPromise
-                    user = txResult[0].user
+                    user = txResult[0] != undefined ? txResult[0].user : undefined;
 
                     let sOptions = {
                         issuer: "Authorization",
@@ -156,7 +169,7 @@ const resolvers = {
                         return;
                     })
                     let txResult = await writeTxResultPromise
-                    user = txResult[0].user
+                    user = txResult[0] != undefined ? txResult[0].user : null;
                 
                     writeTxResultPromise = session.writeTransaction(async txc => {
                         result = await txc.run(
@@ -186,7 +199,7 @@ const resolvers = {
                             isDone: $isDone, 
                             createdAt: $createdAt  
                         })
-                        RETURN(listItem)
+                        RETURN listItem {.*}
                         `,
                             { 
                                 id: newLargestId, 
@@ -197,7 +210,8 @@ const resolvers = {
                         )
                         if (result != null) {                                
                             return result.records.map(record => ({
-                                listItem: record.get('listItem').properties
+                                // TODO: refactor the rest of the queries
+                                listItem: record.get('listItem')
                             }))
                         }
                         return;
@@ -417,15 +431,13 @@ const resolvers = {
                     let result = await txc.run(
                         `
                         MATCH (listItem: ListItem { id: $id })
-                        MATCH (user:User)<-[:ASSIGNED]-(listItem)
-                        RETURN listItem, user
+                        RETURN listItem
                          `,
                             { id: Number(args.id) },
                         )
                     if (result != null) {
                         return result.records.map(record => ({
-                            listItem: record.get('listItem').properties,
-                            user: record.get('user').properties
+                            listItem: record.get('listItem') != undefined ? record.get('listItem').properties : null
                         }))
                     }
                     return;
@@ -433,31 +445,43 @@ const resolvers = {
                 let txResult = await writeTxResultPromise
 
                 listItem = txResult[0] != undefined ? txResult[0].listItem : null;
-                user = txResult[0] != undefined ? txResult[0].user : null;
                 
                 if (listItem != null) {
+
                     writeTxResultPromise = session.writeTransaction(async txc => {
                         result = await txc.run(
                             `
-                        MATCH (listItem: ListItem { id: $id })
-                        DETACH DELETE listItem
-                         `,
-                            { id: Number(args.id) },
-                        )
+                            MATCH (listItem: ListItem { id: $id })
+                            MATCH (user:User)<-[:ASSIGNED]-(listItem)
+                            RETURN user
+                             `,
+                                { id: Number(args.id) },
+                            )
                         if (result != null) {
                             return result.records.map(record => ({
-                                listItem: record.get('listItem').properties,
-                                user: record.get('user').properties
+                                user: record.get('user')!=null ? record.get('user').properties: null
                             }))
                         }
-                        return;
                     })
                     txResult = await writeTxResultPromise
-
-                    listItem.assignee = user;
+    
+                    user = txResult[0] != undefined ? txResult[0].user : null;
+                    writeTxResultPromise = session.writeTransaction(async txc => {
+                        result = await txc.run(
+                            `
+                            MATCH (listItem: ListItem { id: $id })
+                            DETACH DELETE listItem
+                            `,
+                                { id: Number(args.id) },
+                            )
+                    })
+                    txResult = await writeTxResultPromise
+                    if(user!=null) {
+                        listItem.assignee = user;
+                    }
                     listItemInfo = new ListItemInfo(listItem);
-                }
-                return listItemInfo;
+                    return listItemInfo;
+                } 
             } finally {
                 session.close()
             }
