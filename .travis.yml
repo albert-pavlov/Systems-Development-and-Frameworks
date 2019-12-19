@@ -4,11 +4,9 @@ branches:
   - dev_4
 
 install:
-  - cd ../Backend
   - yarn install
-  
+
 script:
-  - cd ../Backend
   - yarn run db:reset
   - yarn run db:seed
   - yarn run test
