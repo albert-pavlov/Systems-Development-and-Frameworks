@@ -12,7 +12,7 @@ const typeDefs = gql`
         finishListItem(id: ID!): ListItemInfo
         deleteListItem(id: ID!): ListItemInfo
         createUser(name: String!, pwd: String!): UserInfo
-        login(usr: String!, pwd: String!): String!
+        login(usr: String!, pwd: String!): [String!]
     }
 
     type ListItem {
