@@ -100,12 +100,7 @@ export default {
         .then(result => {
           const item = result.data.createListItem;
           //ui
-          this.items.push({
-            id: item.id,
-            message: item.message,
-            isDone: item.isDone,
-            createdAt: item.createdAt
-          });
+          this.items.push(item);
         })
         .catch(error => {
           this.errorMsg = error;
