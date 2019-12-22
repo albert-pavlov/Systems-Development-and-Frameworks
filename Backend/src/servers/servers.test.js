@@ -24,8 +24,7 @@ describe('Mutatations requiring auth', () => {
 			variables: { usr: 'Mallory', pwd: '123456' }
         })        
         let jwt = response.data.login
-
-		const testServer = getTestServer(jwt);
+		const testServer = getTestServer(jwt[0]);
 		mutate = createTestClient(testServer).mutate;
     });
 
@@ -365,7 +364,7 @@ describe('Queries requiring auth', () => {
         })        
         let jwt = response.data.login
 
-        const testServer = getTestServer(jwt);
+        const testServer = getTestServer(jwt[0]);
 		query = createTestClient(testServer).query;
     });
 
@@ -533,7 +532,7 @@ describe('Mutatations without auth', () => {
             const expected = {
                 errors: undefined,
                 data: {
-                    login: expect.any(String),
+                    login: expect.any(Array),
                 }
             }
             await expect(mutate({ mutation: login, variables })).resolves.toMatchObject(expected)
@@ -544,7 +543,7 @@ describe('Mutatations without auth', () => {
             const expected = {
                 errors: undefined,
                 data: {
-                    login: 'Wrong username and/or password!'
+                    login: ['Wrong username and/or password!']
                 }
             }
             await expect(mutate({ mutation: login, variables })).resolves.toMatchObject(expected)

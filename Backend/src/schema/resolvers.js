@@ -137,7 +137,7 @@ const resolvers = {
                         audience: "HTW Alumni"
                     }
 
-                    return user != undefined ? [jwtService.sign({}, sOptions), user.id, user.name ]: "Wrong username and/or password!";
+                    return user != undefined ? [jwtService.sign({}, sOptions), user.id, user.name ]: ["Wrong username and/or password!"];
                 }
                 finally {
                     session.close();
