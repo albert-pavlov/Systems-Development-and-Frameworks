@@ -6,7 +6,7 @@
       <button id="button-edit-end" @click="editModeEnd">Cancel</button>
     </form>
     <template v-else>
-      <p id="item-description">id: {{item.id}} | message: {{item.message}} | isDone: {{item.isDone}} | createdAt: {{item.createdAt}}</p>
+      <p id="item-description">Todo | id: {{item.id}} | message: {{item.message}} | isDone: {{item.isDone}} | createdAt: {{item.createdAt}}</p>
       <button id="button-done" @click="doneItem" :disabled="item.isDone">Done</button>
       <button id="button-edit-start" @click="editModeStart">Edit</button>
       <button id="button-delete" @click="deleteItem">Delete</button>

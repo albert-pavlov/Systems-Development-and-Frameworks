@@ -1,7 +1,7 @@
 <template>
   <div>
     <form>
-      <input id="input-edit" type="text" v-model="addTodoMsg" />
+      <input id="input-edit" type="text" v-model="addTodoMsg" placeholder="New todo" />
       <button @click.prevent="addItem()">Add</button>
     </form>
     <template v-if="(items.length > 0)">
@@ -16,7 +16,9 @@
         />
       </ul>
     </template>
-    <template v-else>Todo list empty.</template>
+    <template v-else>
+      <p style="color: red">Todo list is empty.</p>
+    </template>
     <p style="color: red" v-if="(errorMsg.length > 0)">{{errorMsg}}</p>
   </div>
 </template>
@@ -76,6 +78,7 @@ export default {
     },
     addItem() {
       if (this.addTodoMsg.length <= 0) return;
+      //db
       this.errorMsg = "";
       this.$apollo
         .mutate({
@@ -96,6 +99,7 @@ export default {
         })
         .then(result => {
           const item = result.data.createListItem;
+          //ui
           this.items.push({
             id: item.id,
             message: item.message,
@@ -109,15 +113,49 @@ export default {
       this.addTodoMsg = "";
     },
     doneItem(item) {
-      //
-      alert(item.isDone);
+      //db
+      this.errorMsg = "";
+      this.$apollo
+        .mutate({
+          mutation: gql`
+            mutation finishListItem($id: ID!) {
+              finishListItem(id: $id) {
+                id
+              }
+            }
+          `,
+          variables: {
+            id: item.id
+          }
+        })
+        .catch(error => {
+          this.errorMsg = error;
+        });
     },
     editItem(item) {
       //
       alert(item.message);
     },
     deleteItem(item) {
-      alert(item.id);
+      //db
+      this.errorMsg = "";
+      this.$apollo
+        .mutate({
+          mutation: gql`
+            mutation deleteListItem($id: ID!) {
+              deleteListItem(id: $id) {
+                id
+              }
+            }
+          `,
+          variables: {
+            id: item.id
+          }
+        })
+        .catch(error => {
+          this.errorMsg = error;
+        });
+      //ui
       this.items = this.items.filter(i => i.id !== item.id);
     }
   }

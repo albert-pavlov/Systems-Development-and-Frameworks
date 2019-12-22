@@ -6,9 +6,9 @@
     <template v-else>
       <h2>Todos</h2>
       <h3>
-        Name: {{userName}}
+        User Name: {{userName}}
         <br />
-        ID: {{userId}}
+        User ID: {{userId}}
       </h3>
       <list />
     </template>

@@ -1,6 +1,7 @@
 <template>
   <div>
     <form>
+      <h2>Login</h2>
       <input v-model="user" type="text" placeholder="User" autofocus />
       <input v-model="pass" type="password" placeholder="Password" />
       <button @click.prevent="submit()" :disabled="(user.length <= 0 || pass.length <= 0)">Login</button>
