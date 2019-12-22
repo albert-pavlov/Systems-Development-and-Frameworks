@@ -1,13 +1,25 @@
 language: generic
 
 branches:
-  - dev_4
+  - dev_5_full
 
 install:
+  - cd VueJS
+  - npm install
   - cd Backend
   - yarn install
 
 script:
+  - cd ../VueJS
+  - npm run lint
+  - npm run test
+  - cd ../Backend
   - yarn run db:reset
   - yarn run db:seed
   - yarn run test
+
+after_success:
+  - cd Backend
+  - yarn run start
+  - cd VueJS
+  - npm run build
