@@ -4,6 +4,7 @@ const typeDefs = gql`
     type Query {
         getOneListItem(id: ID!): ListItemInfo
         getAllListItems(isDone: Boolean, orderBy: ORDERBY): [ListItem]
+        getAssignedListItems(assigneeID: ID!): [ListItemInfo]
     }
 
     type Mutation {

@@ -63,6 +63,70 @@ const resolvers = {
             } finally {
                 session.close()
             }
+        },
+        getAssignedListItems: async function (parent, args, context, info) {
+            let listItems = [];
+            let user;
+
+            const session = context.driver.session()
+
+            try {
+                let writeTxResultPromise = session.writeTransaction(async txc => {
+                    let result = await txc.run(
+                    `
+                    MATCH (user: User { id: $id })                          
+                    RETURN user
+                        `,
+                        { id: args.assigneeID != null ? Number(args.assigneeID) : null }
+                    )
+                    if (result != null) {
+                        return result.records.map(record => ({
+                            user: record.get('user') != undefined ? record.get('user').properties : null
+                        }))
+                    }
+                    return;
+                })
+                let txResult = await writeTxResultPromise
+                user = txResult[0] != undefined ? txResult[0].user : null;
+
+                if(user!=null) {
+                    writeTxResultPromise = session.writeTransaction(async txc => {
+                        result = await txc.run(                           
+                        `
+                        MATCH(u:User {id: $id})
+                        MATCH (u)-[:ASSIGNED]-(li:ListItem)
+                        RETURN(li)
+                        `,
+                            { 
+                                id: user.id 
+                            }
+                        )
+                        if (result != null) {
+                            return result.records.map(record => ({
+                                li: record.get('li') != undefined ? record.get('li').properties : null
+                            }))
+                        }                            
+                    })
+                    txResult = await writeTxResultPromise;
+                    if(txResult != undefined){
+                        txResult.forEach(listItem => {
+                            listItems.push(listItem.li)
+                        })
+                    }
+                    if(listItems.length != 0) {
+                        listItems.forEach(li => {
+                            li.assignee = user;
+                        })
+                    }
+                    return listItems;
+
+                } else {
+                    return new Error('User with such ID doesn\'t exist.');
+                }
+            }
+            finally {
+                session.close();
+            }
         },        
         getAllListItems: async function(parent, args, context, info) {
             let allListItems = [];

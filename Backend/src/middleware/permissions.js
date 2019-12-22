@@ -59,6 +59,7 @@ const permissions = shield({
     Query: {
         "*": deny,
         getOneListItem: isAuthenticated,
+        getAssignedListItems: isAuthenticated,
         getAllListItems: isAuthenticated
     },
     Mutation: {
