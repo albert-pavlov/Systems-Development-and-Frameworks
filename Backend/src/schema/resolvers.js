@@ -210,7 +210,6 @@ const resolvers = {
                         )
                         if (result != null) {                                
                             return result.records.map(record => ({
-                                // TODO: refactor the rest of the queries
                                 listItem: record.get('listItem')
                             }))
                         }
@@ -251,7 +250,6 @@ const resolvers = {
         assignListItem: async function (parent, args, context, info) {
             let listItem;
             let user;
-            let rel;
 
             const session = context.driver.session()
 
@@ -298,48 +296,24 @@ const resolvers = {
                 txResult = await writeTxResultPromise
                 user = txResult[0]!= undefined ? txResult[0].user : null;         
 
-                // check if the list item has already been assigned to a different user
-                writeTxResultPromise = session.writeTransaction(async txc => {
-                    result = await txc.run(
-                        `
-                        MATCH(listItem: ListItem { id: $id })
-                        MATCH(listItem)-[r]->(:User)
-                        RETURN r
-                 `,
-                        {
-                            id: Number(args.id),
-                        },
-                    )
-                    if (result != null) {
-                        return result.records.map(record => ({
-                            rel: record.get('r').properties
-                        }))
-                    }
-                    return;
-                })
-                txResult = await writeTxResultPromise
-                rel = txResult[0]!= undefined ? txResult[0].r : null;               
-
-
                 if (listItem != null) {
-                    if (user != null) {
-                        if (rel != null) {                            
-                            // delete the relation between the list item and the current assignee
-                            // multiple assignments of a single list item are not allowed
-                            writeTxResultPromise = session.writeTransaction(async txc => {
-                                result = await txc.run(
-                                    `
-                                    MATCH(listItem: ListItem { id: $id })
-                                    MATCH(listItem)-[r]->(:User)
-                                    DELETE(r)
-                             `,
-                                    {
-                                        id: Number(args.id)
-                                    },
-                                )
-                            })
-                            txResult = await writeTxResultPromise
-                        }
+                    if (user != null) {                                                
+                        // delete the relation between the list item and the current assignee
+                        // multiple assignments of a single list item are not allowed
+                        writeTxResultPromise = session.writeTransaction(async txc => {
+                            result = await txc.run(
+                                `
+                                MATCH(listItem: ListItem { id: $id })
+                                MATCH(listItem)-[r]->(:User)
+                                DELETE(r)
+                            `,
+                                {
+                                    id: Number(args.id)
+                                },
+                            )
+                        })
+                        txResult = await writeTxResultPromise
+                        
                         // reassign the list item to the new user
                         // multiple assignments of a single list item are not allowed
                         writeTxResultPromise = session.writeTransaction(async txc => {
