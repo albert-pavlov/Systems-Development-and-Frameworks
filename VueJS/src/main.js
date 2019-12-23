@@ -31,7 +31,7 @@ const apolloClient = new ApolloClient({
 Vue.use(VueApollo);
 
 const apolloProvider = new VueApollo({
-  defaultClient: apolloClient,
+  defaultClient: apolloClient
 });
 
 new Vue({

@@ -4,7 +4,7 @@
       <input id="input-edit" type="text" v-model="addTodoMsg" placeholder="New todo" />
       <button @click.prevent="addItem()">Add</button>
     </form>
-    <template v-if="(items.length > 0)">
+    <template v-if="(itemsRetrieved && items.length > 0)">
       <ul>
         <list-item
           v-for="item in items"
@@ -16,8 +16,11 @@
         />
       </ul>
     </template>
-    <template v-else>
+    <template v-if="(itemsRetrieved && items.length <= 0)">
       <p style="color: red">Todo list is empty.</p>
+    </template>
+    <template v-if="(!itemsRetrieved)">
+      <p>Loading items...</p>
     </template>
     <p style="color: red" v-if="(errorMsg.length > 0)">{{errorMsg}}</p>
   </div>
@@ -37,7 +40,8 @@ export default {
     return {
       items: [],
       addTodoMsg: "",
-      errorMsg: ""
+      errorMsg: "",
+      itemsRetrieved: false
     };
   },
   computed: {
@@ -71,6 +75,7 @@ export default {
         })
         .then(result => {
           this.items = result.data.getAssignedListItems;
+          this.itemsRetrieved = true;
         })
         .catch(error => {
           this.errorMsg = error;
