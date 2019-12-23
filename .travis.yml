@@ -6,7 +6,7 @@ branches:
 install:
   - cd VueJS
   - npm install
-  - cd Backend
+  - cd ../Backend
   - yarn install
 
 script:
@@ -19,7 +19,7 @@ script:
   - yarn run test
 
 after_success:
-  - cd Backend
+  - cd ../Backend
   - yarn run start
-  - cd VueJS
+  - cd ../VueJS
   - npm run build

@@ -7,7 +7,9 @@ describe('ListItem', () => {
             propsData: {
                 item: { 
                     id: 1, 
-                    message: "Foo" 
+                    message: "Foo",
+                    isDone: false,
+                    createdAt: ""
                 }
             }
         });
@@ -19,7 +21,7 @@ describe('ListItem', () => {
 
         it('renders item', () => {
             const foundItem = wrapper.find('p#item-description');
-            expect(foundItem.text()).toEqual("1. Foo");
+            expect(foundItem.text()).toEqual("Todo | id: 1 | message: Foo | isDone: false | createdAt:");
         });
 
         it('does not show input field', () => {
