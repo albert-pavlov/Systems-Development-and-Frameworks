@@ -2,7 +2,7 @@
   <div>
     <form>
       <h1>Login</h1>
-      <input v-model="user" type="text" placeholder="User" autofocus :disabled="submitted" />
+      <input v-model="user" type="text" placeholder="User" :disabled="submitted" ref="userRef" />
       <input v-model="pass" type="password" placeholder="Password" :disabled="submitted" />
       <button
         @click.prevent="submit()"
@@ -30,6 +30,11 @@ export default {
       errorMsg: "",
       submitted: false
     };
+  },
+  mounted() {
+    this.$nextTick(() => {
+      this.$refs.userRef.focus();
+    });
   },
   methods: {
     submit() {

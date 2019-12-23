@@ -1,7 +1,7 @@
 <template>
   <div>
     <form>
-      <input id="input-edit" type="text" v-model="addTodoMsg" placeholder="New Todo" autofocus />
+      <input type="text" v-model="addTodoMsg" ref="addTodoMsg" placeholder="New Todo" />
       <button @click.prevent="addItem()">Add</button>
     </form>
     <ul v-if="(itemsRetrieved && items.length > 0)">
@@ -47,6 +47,11 @@ export default {
   },
   beforeMount() {
     this.loadItems();
+  },
+  mounted() {
+    this.$nextTick(() => {
+      this.$refs.addTodoMsg.focus();
+    });
   },
   methods: {
     loadItems() {

@@ -40,7 +40,7 @@ export default {
   methods: {
     doneItem() {
       this.item.isDone = true;
-      this.$emit("editTodoMsg", this.item);
+      this.$emit("done-item", this.item);
     },
     editModeStart() {
       this.editMode = true;

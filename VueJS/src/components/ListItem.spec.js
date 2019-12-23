@@ -38,7 +38,7 @@ describe("ListItem", () => {
 
       it("edit text and submit, hides input field", () => {
         expect(wrapper.vm.editMode).toBeTruthy();
-        wrapper.setData({ message: "Edited message" });
+        wrapper.setData({ editTodoMsg: "Edited message" });
         wrapper.find("button#button-save").trigger("click");
         expect(wrapper.vm.item.message).toEqual("Edited message");
         expect(wrapper.find("input#input-edit").exists()).toBeFalsy();
