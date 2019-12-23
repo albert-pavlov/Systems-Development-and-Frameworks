@@ -130,6 +130,8 @@ export default {
         });
     },
     deleteItem(item) {
+      //ui
+      this.items = this.items.filter(i => i.id !== item.id);
       //db
       this.errorMsg = "";
       this.$apollo
@@ -138,10 +140,6 @@ export default {
           variables: {
             id: item.id
           }
-        })
-        .then(() => {
-          //ui
-          this.items = this.items.filter(i => i.id !== item.id);
         })
         .catch(error => {
           this.handleError(error);
