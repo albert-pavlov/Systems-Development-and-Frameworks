@@ -417,6 +417,93 @@ const resolvers = {
                 session.close()
             }
         },
+        updateListItem: async function (parent, args, context, info) {
+            let listItem;
+            let user;
+
+            const session = context.driver.session()
+            try {
+                // check if such list item exists
+                let writeTxResultPromise = session.writeTransaction(async txc => {
+                    let result = await txc.run(
+                        `
+                        MATCH(listItem: ListItem { id: $id })                        
+                        RETURN listItem
+                 `,
+                        { 
+                            id: Number(args.id)
+                        },
+                    )
+                    if (result != null) {
+                        return result.records.map(record => ({
+                            listItem: record.get('listItem') != undefined ? record.get('listItem').properties : null
+                        }))
+                    }
+                    return;
+                })
+                let txResult = await writeTxResultPromise
+                listItem = txResult[0] != undefined ? txResult[0].listItem : null;
+
+                writeTxResultPromise = session.writeTransaction(async txc => {
+                    result = await txc.run(
+                        `
+                        MATCH(listItem: ListItem { id: $id })
+                        MATCH(user:User)-[:ASSIGNED]-(listItem)
+                        RETURN user
+                 `,
+                        {
+                            id: Number(args.id)
+                        },
+                    )
+                    if (result != null) {
+                        return result.records.map(record => ({
+                            user: record.get('user') != undefined ? record.get('user').properties : null
+                        }))
+                    }
+                    return;
+                })
+                txResult = await writeTxResultPromise
+                user = txResult[0] != undefined ? txResult[0].user : null;         
+
+                if (listItem != null) {
+                    if (user != null) {  
+                        if(user.id == args.userId) {                                              
+                            writeTxResultPromise = session.writeTransaction(async txc => {
+                                result = await txc.run(
+                                    `
+                                    MATCH(listItem: ListItem { id: $id })
+                                    SET listItem.message = $message
+                                    RETURN listItem 
+                                `,
+                                    {
+                                        id: Number(args.id),
+                                        message: args.message
+                                    },
+                                )
+                                if (result != null) {
+                                    return result.records.map(record => ({
+                                        listItem: record.get('listItem') != undefined ? record.get('listItem').properties : null
+                                    }))
+                                }  
+                            })
+                            txResult = await writeTxResultPromise
+                            
+                            updatedListItem = txResult[0] != undefined ? txResult[0].listItem : null ;
+                            updatedListItem. assignee = user;
+                            return updatedListItem;
+                        } else {
+                            throw new Error('Updating only allowed for list items assigned to self.');
+                        }
+                    } else {
+                        throw new Error('Assignee with such ID doesn\'t exist.');
+                    }
+                } else {
+                    throw new Error('List item with such ID doesn\'t exist.');
+                }
+            } finally {
+                session.close()
+            }
+        },  
         finishListItem: async function(parent, args, context, info) {
                 let listItemInfo;               
                 let listItem;
