@@ -10,7 +10,7 @@
 </template>
 
 <script>
-import { Settings } from "./settings.js";
+import { Settings, Key } from "./settings.js";
 import Login from "./components/Login.vue";
 import Todos from "./components/Todos.vue";
 
@@ -22,7 +22,7 @@ export default {
   },
   data() {
     return {
-      loggedIn: (Settings.getAuthToken() != null)
+      loggedIn: Settings.get(Key.AuthToken) != null
     };
   },
   methods: {

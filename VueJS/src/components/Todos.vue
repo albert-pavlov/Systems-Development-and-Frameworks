@@ -13,7 +13,7 @@
 </template>
 
 <script>
-import { Settings } from "../settings.js";
+import { Settings, Key } from "../settings.js";
 import List from "./List.vue";
 
 export default {
@@ -23,8 +23,8 @@ export default {
   },
   data() {
     return {
-      userId: Settings.getUserId(),
-      userName: Settings.getUserName()
+      userId: Settings.get(Key.UserId),
+      userName: Settings.get(Key.UserName)
     };
   }
 };

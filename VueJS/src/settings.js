@@ -1,37 +1,21 @@
-export const GLOBAL_AUTH_TOKEN = "global-auth-token";
-export const GLOBAL_USER_ID = "global-user-id";
-export const GLOBAL_USER_NAME = "global-user-name";
+export const Key = Object.freeze({
+  AuthToken: "global-auth-token",
+  UserId: "global-user-id",
+  UserName: "global-user-name"
+});
 
 export var Settings = {
-  remVar(key) {
+  rem(key) {
     return localStorage.removeItem(key);
   },
-  getVar(key) {
+  get(key) {
     return localStorage.getItem(key);
   },
-  setVar(key, value) {
-    localStorage.setItem(key, value);
-  },
-  getAuthToken() {
-    return this.getVar(GLOBAL_AUTH_TOKEN);
-  },
-  setAuthToken(value) {
+  set(key, value) {
     if (value != null) {
-      this.setVar(GLOBAL_AUTH_TOKEN, value);
+      localStorage.setItem(key, value);
     } else {
-      this.remVar(GLOBAL_AUTH_TOKEN);
+      this.rem(key);
     }
-  },
-  getUserId() {
-    return this.getVar(GLOBAL_USER_ID);
-  },
-  setUserId(value) {
-    this.setVar(GLOBAL_USER_ID, value);
-  },
-  getUserName() {
-    return this.getVar(GLOBAL_USER_NAME);
-  },
-  setUserName(value) {
-    this.setVar(GLOBAL_USER_NAME, value);
   }
 };

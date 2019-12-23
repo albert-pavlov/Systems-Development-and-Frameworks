@@ -21,7 +21,7 @@
 </template>
 
 <script>
-import { Settings } from "../settings.js";
+import { Settings, Key } from "../settings.js";
 import ListItem from "./ListItem.vue";
 
 export default {
@@ -35,7 +35,7 @@ export default {
       addTodoMsg: "",
       errorMsg: "",
       itemsRetrieved: false,
-      userId: Settings.getUserId()
+      userId: Settings.get(Key.UserId)
     };
   },
   beforeMount() {
@@ -52,7 +52,7 @@ export default {
       this.itemsRetrieved = true;
       var noAuthStr = "Not Authorised!";
       if (String(error).match(noAuthStr + "$") == noAuthStr) {
-        Settings.setAuthToken(null);
+        Settings.set(Key.AuthToken, null);
         this.errorMsg +=
           " Logged out from the session. You will be redirected to the login page in a few seconds.";
         setTimeout(() => {

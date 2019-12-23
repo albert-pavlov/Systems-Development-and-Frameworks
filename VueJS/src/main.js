@@ -8,10 +8,10 @@ import { ApolloLink } from "apollo-link";
 import { onError } from "apollo-link-error";
 import { createHttpLink } from "apollo-link-http";
 import { InMemoryCache } from "apollo-cache-inmemory";
-import { Settings } from "./settings.js";
+import { Settings, Key } from "./settings.js";
 
 const authMiddleware = new ApolloLink((operation, forward) => {
-  const token = Settings.getAuthToken();
+  const token = Settings.get(Key.AuthToken);
   operation.setContext({
     headers: {
       authorization: token ? `${token}` : null
@@ -30,7 +30,7 @@ const errorLink = onError(({ graphQLErrors, networkError }) => {
   if (networkError) {
     console.log(`[Network error]: ${networkError}`);
     if (networkError.statusCode === 401) {
-      Settings.setAuthToken(null);
+      Settings.set(Key.AuthToken, null);
     }
   }
 });

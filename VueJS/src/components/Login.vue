@@ -14,7 +14,7 @@
 </template>
 
 <script>
-import { Settings } from "../settings.js";
+import { Settings, Key } from "../settings.js";
 
 export default {
   name: "login",
@@ -46,9 +46,9 @@ export default {
         .then(result => {
           const data = result.data.login;
           if (data.length >= 3) {
-            Settings.setAuthToken(data[0]);
-            Settings.setUserId(data[1]);
-            Settings.setUserName(data[2]);
+            Settings.set(Key.AuthToken, data[0]);
+            Settings.set(Key.UserId, data[1]);
+            Settings.set(Key.UserName, data[2]);
             this.$emit("toggle-logged-in");
           } else {
             this.errorMsg = data[0];
