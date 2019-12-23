@@ -17,8 +17,7 @@ before_install:
   - tar -xzf neo4j-community-$NEO4J_VERSION-unix.tar.gz
   - neo4j-community-$NEO4J_VERSION/bin/neo4j start
   - sleep 10
-  - curl -v POST http://neo4j:neo4j@localhost:7474/user/neo4j/password -d"password=password"
-  - curl -v POST http://neo4j:neo4j2@localhost:7474/user/neo4j/password -d"password=password"
+  - curl -v POST http://neo4j:password@localhost:7474/user/neo4j
 
 install:
   - cd VueJS
