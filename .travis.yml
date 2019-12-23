@@ -36,7 +36,5 @@ script:
   - yarn run test
 
 after_success:
-  - cd ../Backend
-  - yarn run start
   - cd ../VueJS
   - npm run build
