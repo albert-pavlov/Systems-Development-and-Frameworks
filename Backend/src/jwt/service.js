@@ -11,7 +11,7 @@ module.exports = {
       issuer:  $Options.issuer,
       subject:  $Options.subject,
       audience:  $Options.audience,
-      expiresIn:  "3h",
+      expiresIn:  "1000",
       algorithm:  "RS512"    
   };
   return jwt.sign(payload, privateKEY, signOptions);
@@ -22,7 +22,7 @@ verify: (token, $Option) => {
       issuer:  $Option.issuer,
       subject:  $Option.subject,
       audience:  $Option.audience,
-      expiresIn:  "3h",
+      expiresIn:  "1000",
       algorithm:  ["RS512"]
   };
    try{
