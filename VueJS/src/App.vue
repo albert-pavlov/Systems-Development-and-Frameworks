@@ -22,7 +22,7 @@ export default {
   },
   data() {
     return {
-      loggedIn: Settings.getAuthToken() != null
+      loggedIn: (Settings.getAuthToken() != null)
     };
   },
   methods: {
