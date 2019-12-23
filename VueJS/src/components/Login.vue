@@ -1,11 +1,14 @@
 <template>
   <div>
     <form>
-      <h2>Login</h2>
+      <h1>Login</h1>
       <input v-model="user" type="text" placeholder="User" autofocus :disabled="submitted" />
       <input v-model="pass" type="password" placeholder="Password" :disabled="submitted" />
-      <button @click.prevent="submit()" :disabled="(user.length <= 0 || pass.length <= 0 || submitted)">Login</button>
-      <p style="color: red" v-if="!(errorMsg.length > 0)">{{errorMsg}}</p>
+      <button
+        @click.prevent="submit()"
+        :disabled="(user.length <= 0 || pass.length <= 0 || submitted)"
+      >Login</button>
+      <p style="color: red">{{errorMsg}}</p>
     </form>
   </div>
 </template>
@@ -53,13 +56,21 @@ export default {
             this.$emit("toggle-logged-in");
           } else {
             this.errorMsg = data[0];
+            this.submitted = false;
           }
         })
         .catch(error => {
-          this.submitted = false;
           this.errorMsg = error;
+          this.submitted = false;
         });
     }
   }
 };
 </script>
+
+<style scoped>
+input,
+button {
+  margin-right: 5px;
+}
+</style>

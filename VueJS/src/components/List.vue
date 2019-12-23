@@ -1,7 +1,7 @@
 <template>
   <div>
     <form>
-      <input id="input-edit" type="text" v-model="addTodoMsg" placeholder="New Todo" />
+      <input id="input-edit" type="text" v-model="addTodoMsg" placeholder="New Todo" autofocus />
       <button @click.prevent="addItem()">Add</button>
     </form>
     <ul v-if="(itemsRetrieved && items.length > 0)">
@@ -16,14 +16,14 @@
     </ul>
     <p v-if="(itemsRetrieved && items.length <= 0)">Todo list is empty.</p>
     <p v-if="(!itemsRetrieved)">Loading todos...</p>
-    <p style="color: red" v-if="!(errorMsg.length > 0)">{{errorMsg}}</p>
+    <p style="color: red">{{errorMsg}}</p>
   </div>
 </template>
 
 <script>
-import ListItem from "./ListItem.vue";
 import gql from "graphql-tag";
 import { GLOBAL_USER_ID } from "../settings.js";
+import ListItem from "./ListItem.vue";
 
 export default {
   name: "list",
@@ -179,10 +179,14 @@ export default {
 
 <style scoped>
 ul {
-  list-style: circle;
+  list-style: none;
+  padding: 0;
 }
 li {
   margin-top: 5px;
   margin-bottom: 5px;
+}
+button {
+  margin-left: 5px;
 }
 </style>

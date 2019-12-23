@@ -4,50 +4,26 @@
       <login @toggle-logged-in="toggleLoggedIn" />
     </template>
     <template v-else>
-      <h2>Todos</h2>
-      <h3>
-        User Name: {{userName}}
-        <br />
-        User ID: {{userId}}
-      </h3>
-      <list />
+      <todos />
     </template>
   </div>
 </template>
 
 <script>
-import List from "./components/List.vue";
+import { GLOBAL_AUTH_TOKEN } from "./settings.js";
 import Login from "./components/Login.vue";
-import {
-  GLOBAL_AUTH_TOKEN,
-  GLOBAL_USER_ID,
-  GLOBAL_USER_NAME
-} from "./settings.js";
+import Todos from "./components/Todos.vue";
 
 export default {
   name: "app",
   components: {
-    List,
-    Login
+    Login,
+    Todos
   },
   data() {
     return {
       loggedIn: localStorage.getItem(GLOBAL_AUTH_TOKEN) != null
     };
-  },
-  computed: {
-    userId: function() {
-      var userId = localStorage.getItem(GLOBAL_USER_ID);
-      if (userId != null) return userId;
-      else return -1;
-    },
-    userName: function() {
-      var userName = localStorage.getItem(GLOBAL_USER_NAME);
-      if (userName != null) {
-        return userName;
-      }
-      return "";
-    }
   },
   methods: {
     toggleLoggedIn() {
