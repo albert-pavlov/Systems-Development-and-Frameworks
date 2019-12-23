@@ -68,6 +68,7 @@ const permissions = shield({
         createUser: allow,
         createListItem: isAuthenticated,
         assignListItem: isAuthenticated,
+        updateListItem: isAuthenticated,
         finishListItem: isAuthenticated,
         deleteListItem: isAuthenticated        
     },
