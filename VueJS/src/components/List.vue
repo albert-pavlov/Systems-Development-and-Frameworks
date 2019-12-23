@@ -64,7 +64,7 @@ export default {
       this.errorMsg = "";
       this.$apollo
         .query({
-          query: require("../graphql/loadItems.gql"),
+          query: require("../graphql/getAssignedListItems.gql"),
           variables: {
             assigneeID: this.userId
           }
