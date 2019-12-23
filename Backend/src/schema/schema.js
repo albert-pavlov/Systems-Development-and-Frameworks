@@ -10,7 +10,8 @@ const typeDefs = gql`
     type Mutation {
         createListItem(message: String!, assigneeID: ID): ListItem
         assignListItem(id: ID!, assigneeID: ID!): ListItem
-g        finishListItem(id: ID!): ListItemInfo
+        finishListItem(id: ID!): ListItemInfo
+        updateListItem(id: ID!, userId: ID!, message: String!): ListItemInfo
         deleteListItem(id: ID!): ListItemInfo
         createUser(name: String!, pwd: String!): UserInfo
         login(usr: String!, pwd: String!): [String!]

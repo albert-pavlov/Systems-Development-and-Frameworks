@@ -133,8 +133,27 @@ export default {
         });
     },
     editItem(item) {
-      //
-      alert(item.message);
+      //db
+      this.errorMsg = "";
+      this.$apollo
+        .mutate({
+          mutation: gql`
+            mutation updateListItem($id: ID!, $userId: ID!, $message: String!) {
+              updateListItem(id: $id, userId: $userId, message: $message) {
+                id
+                message
+              }
+            }
+          `,
+          variables: {
+            id: item.id,
+            userId: this.userId,
+            message: item.message
+          }
+        })
+        .catch(error => {
+          this.errorMsg = error;
+        });
     },
     deleteItem(item) {
       //db
