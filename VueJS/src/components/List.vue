@@ -1,28 +1,22 @@
 <template>
   <div>
     <form>
-      <input id="input-edit" type="text" v-model="addTodoMsg" placeholder="New todo" />
+      <input id="input-edit" type="text" v-model="addTodoMsg" placeholder="New Todo" />
       <button @click.prevent="addItem()">Add</button>
     </form>
-    <template v-if="(itemsRetrieved && items.length > 0)">
-      <ul>
-        <list-item
-          v-for="item in items"
-          v-bind:key="item.id"
-          v-bind:item="item"
-          @done-item="doneItem"
-          @edit-item="editItem"
-          @delete-item="deleteItem"
-        />
-      </ul>
-    </template>
-    <template v-if="(itemsRetrieved && items.length <= 0)">
-      <p style="color: red">Todo list is empty.</p>
-    </template>
-    <template v-if="(!itemsRetrieved)">
-      <p>Loading items...</p>
-    </template>
-    <p style="color: red" v-if="(errorMsg.length > 0)">{{errorMsg}}</p>
+    <ul v-if="(itemsRetrieved && items.length > 0)">
+      <list-item
+        v-for="item in items"
+        v-bind:key="item.id"
+        v-bind:item="item"
+        @done-item="doneItem"
+        @edit-item="editItem"
+        @delete-item="deleteItem"
+      />
+    </ul>
+    <p v-if="(itemsRetrieved && items.length <= 0)">Todo list is empty.</p>
+    <p v-if="(!itemsRetrieved)">Loading todos...</p>
+    <p style="color: red" v-if="!(errorMsg.length > 0)">{{errorMsg}}</p>
   </div>
 </template>
 
@@ -106,11 +100,11 @@ export default {
           const item = result.data.createListItem;
           //ui
           this.items.push(item);
+          this.addTodoMsg = "";
         })
         .catch(error => {
           this.errorMsg = error;
         });
-      this.addTodoMsg = "";
     },
     doneItem(item) {
       //db
@@ -171,11 +165,13 @@ export default {
             id: item.id
           }
         })
+        .then(() => {
+          //ui
+          this.items = this.items.filter(i => i.id !== item.id);
+        })
         .catch(error => {
           this.errorMsg = error;
         });
-      //ui
-      this.items = this.items.filter(i => i.id !== item.id);
     }
   }
 };

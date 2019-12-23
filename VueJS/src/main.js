@@ -1,3 +1,5 @@
+/* eslint no-console: 0 */
+
 import Vue from 'vue'
 import App from './App.vue'
 import VueApollo from 'vue-apollo'

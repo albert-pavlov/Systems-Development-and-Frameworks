@@ -2,10 +2,10 @@
   <div>
     <form>
       <h2>Login</h2>
-      <input v-model="user" type="text" placeholder="User" autofocus />
-      <input v-model="pass" type="password" placeholder="Password" />
-      <button @click.prevent="submit()" :disabled="(user.length <= 0 || pass.length <= 0)">Login</button>
-      <p style="color: red" v-if="(errorMsg.length > 0)">{{errorMsg}}</p>
+      <input v-model="user" type="text" placeholder="User" autofocus :disabled="submitted" />
+      <input v-model="pass" type="password" placeholder="Password" :disabled="submitted" />
+      <button @click.prevent="submit()" :disabled="(user.length <= 0 || pass.length <= 0 || submitted)">Login</button>
+      <p style="color: red" v-if="!(errorMsg.length > 0)">{{errorMsg}}</p>
     </form>
   </div>
 </template>
@@ -24,12 +24,14 @@ export default {
     return {
       user: "",
       pass: "",
-      errorMsg: ""
+      errorMsg: "",
+      submitted: false
     };
   },
   methods: {
     submit() {
       this.errorMsg = "";
+      this.submitted = true;
       this.$apollo
         .mutate({
           mutation: gql`
@@ -54,6 +56,7 @@ export default {
           }
         })
         .catch(error => {
+          this.submitted = false;
           this.errorMsg = error;
         });
     }
