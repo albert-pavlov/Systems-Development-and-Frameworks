@@ -3,6 +3,9 @@ language: generic
 branches:
   - dev_5_full
 
+services:
+  - neo4j
+
 install:
   - cd VueJS
   - npm install
