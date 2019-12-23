@@ -2,7 +2,7 @@
   <div>
     <form>
       <h1>Login</h1>
-      <input v-model="user" type="text" placeholder="User" :disabled="submitted" ref="userRef" />
+      <input v-model="user" type="text" placeholder="User" :disabled="submitted" ref="user" />
       <input v-model="pass" type="password" placeholder="Password" :disabled="submitted" />
       <button
         @click.prevent="submit()"
@@ -33,7 +33,7 @@ export default {
   },
   mounted() {
     this.$nextTick(() => {
-      this.$refs.userRef.focus();
+      this.$refs.user.focus();
     });
   },
   methods: {
