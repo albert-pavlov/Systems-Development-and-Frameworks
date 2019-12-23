@@ -5,7 +5,7 @@ const isAuthenticated = rule({ cache: 'contextual' })(
     async (parent, args, ctx, info) => {
         try{
             let decodedToken = jwtService.decode(ctx.token);
-            if (decodedToken == null || decodedToken == undefined) {
+        if (decodedToken == null || decodedToken == undefined || (Date.now() / 1000 > decodedToken.payload.exp)) {
                 return false;
             }
             let vOptions = {
@@ -27,7 +27,7 @@ const isAuthenticated = rule({ cache: 'contextual' })(
     async (parent, args, ctx, info) => {
         try{
             let decodedToken = jwtService.decode(ctx.token);
-            if (decodedToken == null || decodedToken == undefined) {
+            if (decodedToken == null || decodedToken == undefined || (Date.now() / 1000 > decodedToken.payload.exp)) {
                 return false;
             }
             return decodedToken.payload.sub === (parent.assignee != undefined ? parent.assignee.name : false);
@@ -43,7 +43,7 @@ const isAuthenticated = rule({ cache: 'contextual' })(
     async (parent, args, ctx, info) => {
         try{
             let decodedToken = jwtService.decode(ctx.token);
-            if (decodedToken == null || decodedToken == undefined) {
+            if (decodedToken == null || decodedToken == undefined || (Date.now() / 1000 > decodedToken.payload.exp)) {
                 return false;
             }
             return decodedToken.payload.sub === parent.name;
