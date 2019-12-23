@@ -4,13 +4,13 @@
       <login @toggle-logged-in="toggleLoggedIn" />
     </template>
     <template v-else>
-      <todos />
+      <todos @toggle-logged-in="toggleLoggedIn" />
     </template>
   </div>
 </template>
 
 <script>
-import { GLOBAL_AUTH_TOKEN } from "./settings.js";
+import { Settings } from "./settings.js";
 import Login from "./components/Login.vue";
 import Todos from "./components/Todos.vue";
 
@@ -22,7 +22,7 @@ export default {
   },
   data() {
     return {
-      loggedIn: localStorage.getItem(GLOBAL_AUTH_TOKEN) != null
+      loggedIn: Settings.getAuthToken() != null
     };
   },
   methods: {

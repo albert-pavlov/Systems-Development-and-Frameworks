@@ -8,12 +8,12 @@
         User ID: {{userId}}
       </p>
     </b>
-    <list />
+    <list v-on="$listeners" />
   </div>
 </template>
 
 <script>
-import { GLOBAL_USER_ID, GLOBAL_USER_NAME } from "../settings.js";
+import { Settings } from "../settings.js";
 import List from "./List.vue";
 
 export default {
@@ -21,19 +21,11 @@ export default {
   components: {
     List
   },
-  computed: {
-    userId: () => {
-      var userId = localStorage.getItem(GLOBAL_USER_ID);
-      if (userId != null) return userId;
-      else return -1;
-    },
-    userName: () => {
-      var userName = localStorage.getItem(GLOBAL_USER_NAME);
-      if (userName != null) {
-        return userName;
-      }
-      return "";
-    }
+  data() {
+    return {
+      userId: Settings.getUserId(),
+      userName: Settings.getUserName()
+    };
   }
 };
 </script>

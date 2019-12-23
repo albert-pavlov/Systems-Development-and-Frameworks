@@ -21,8 +21,7 @@
 </template>
 
 <script>
-import gql from "graphql-tag";
-import { GLOBAL_USER_ID } from "../settings.js";
+import { Settings } from "../settings.js";
 import ListItem from "./ListItem.vue";
 
 export default {
@@ -35,15 +34,9 @@ export default {
       items: [],
       addTodoMsg: "",
       errorMsg: "",
-      itemsRetrieved: false
+      itemsRetrieved: false,
+      userId: Settings.getUserId()
     };
-  },
-  computed: {
-    userId: function() {
-      var userId = localStorage.getItem(GLOBAL_USER_ID);
-      if (userId != null) return userId;
-      else return -1;
-    }
   },
   beforeMount() {
     this.loadItems();
@@ -54,20 +47,24 @@ export default {
     });
   },
   methods: {
+    handleError(error) {
+      this.errorMsg = error;
+      this.itemsRetrieved = true;
+      var noAuthStr = "Not Authorised!";
+      if (String(error).match(noAuthStr + "$") == noAuthStr) {
+        Settings.setAuthToken(null);
+        this.errorMsg +=
+          " Logged out from the session. You will be redirected to the login page in a few seconds.";
+        setTimeout(() => {
+          this.$emit("toggle-logged-in");
+        }, 5000);
+      }
+    },
     loadItems() {
       this.errorMsg = "";
       this.$apollo
         .query({
-          query: gql`
-            query getAssignedListItems($assigneeID: ID!) {
-              getAssignedListItems(assigneeID: $assigneeID) {
-                id
-                message
-                isDone
-                createdAt
-              }
-            }
-          `,
+          query: require("../graphql/loadItems.gql"),
           variables: {
             assigneeID: this.userId
           }
@@ -77,7 +74,7 @@ export default {
           this.itemsRetrieved = true;
         })
         .catch(error => {
-          this.errorMsg = error;
+          this.handleError(error);
         });
     },
     addItem() {
@@ -86,16 +83,7 @@ export default {
       this.errorMsg = "";
       this.$apollo
         .mutate({
-          mutation: gql`
-            mutation createListItem($message: String!, $assigneeID: ID) {
-              createListItem(message: $message, assigneeID: $assigneeID) {
-                id
-                message
-                isDone
-                createdAt
-              }
-            }
-          `,
+          mutation: require("../graphql/createListItem.gql"),
           variables: {
             message: this.addTodoMsg,
             assigneeID: this.userId
@@ -108,7 +96,7 @@ export default {
           this.addTodoMsg = "";
         })
         .catch(error => {
-          this.errorMsg = error;
+          this.handleError(error);
         });
     },
     doneItem(item) {
@@ -116,19 +104,13 @@ export default {
       this.errorMsg = "";
       this.$apollo
         .mutate({
-          mutation: gql`
-            mutation finishListItem($id: ID!) {
-              finishListItem(id: $id) {
-                id
-              }
-            }
-          `,
+          mutation: require("../graphql/finishListItem.gql"),
           variables: {
             id: item.id
           }
         })
         .catch(error => {
-          this.errorMsg = error;
+          this.handleError(error);
         });
     },
     editItem(item) {
@@ -136,14 +118,7 @@ export default {
       this.errorMsg = "";
       this.$apollo
         .mutate({
-          mutation: gql`
-            mutation updateListItem($id: ID!, $userId: ID!, $message: String!) {
-              updateListItem(id: $id, userId: $userId, message: $message) {
-                id
-                message
-              }
-            }
-          `,
+          mutation: require("../graphql/updateListItem.gql"),
           variables: {
             id: item.id,
             userId: this.userId,
@@ -151,7 +126,7 @@ export default {
           }
         })
         .catch(error => {
-          this.errorMsg = error;
+          this.handleError(error);
         });
     },
     deleteItem(item) {
@@ -159,13 +134,7 @@ export default {
       this.errorMsg = "";
       this.$apollo
         .mutate({
-          mutation: gql`
-            mutation deleteListItem($id: ID!) {
-              deleteListItem(id: $id) {
-                id
-              }
-            }
-          `,
+          mutation: require("../graphql/deleteListItem.gql"),
           variables: {
             id: item.id
           }
@@ -175,7 +144,7 @@ export default {
           this.items = this.items.filter(i => i.id !== item.id);
         })
         .catch(error => {
-          this.errorMsg = error;
+          this.handleError(error);
         });
     }
   }

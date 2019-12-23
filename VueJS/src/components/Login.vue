@@ -14,12 +14,7 @@
 </template>
 
 <script>
-import {
-  GLOBAL_AUTH_TOKEN,
-  GLOBAL_USER_ID,
-  GLOBAL_USER_NAME
-} from "../settings.js";
-import gql from "graphql-tag";
+import { Settings } from "../settings.js";
 
 export default {
   name: "login",
@@ -42,11 +37,7 @@ export default {
       this.submitted = true;
       this.$apollo
         .mutate({
-          mutation: gql`
-            mutation login($usr: String!, $pwd: String!) {
-              login(usr: $usr, pwd: $pwd)
-            }
-          `,
+          mutation: require("../graphql/login.gql"),
           variables: {
             usr: this.user,
             pwd: this.pass
@@ -54,10 +45,10 @@ export default {
         })
         .then(result => {
           const data = result.data.login;
-          if (data[0] != "Wrong username and/or password!") {
-            localStorage.setItem(GLOBAL_AUTH_TOKEN, data[0]);
-            localStorage.setItem(GLOBAL_USER_ID, data[1]);
-            localStorage.setItem(GLOBAL_USER_NAME, data[2]);
+          if (data.length >= 3) {
+            Settings.setAuthToken(data[0]);
+            Settings.setUserId(data[1]);
+            Settings.setUserName(data[2]);
             this.$emit("toggle-logged-in");
           } else {
             this.errorMsg = data[0];

@@ -1,0 +1,5 @@
+mutation finishListItem($id: ID!) {
+  finishListItem(id: $id) {
+    id
+  }
+}
