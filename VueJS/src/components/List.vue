@@ -43,13 +43,6 @@ export default {
   beforeMount() {
     this.loadItems();
   },
-  mounted() {
-    if (this.itemsRetrieved) {
-      this.$nextTick(() => {
-        this.$refs.addTodoMsg.focus();
-      });
-    }
-  },
   methods: {
     handleError(error) {
       this.errorMsg = error;
@@ -76,6 +69,9 @@ export default {
         .then(result => {
           this.items = result.data.getAssignedListItems;
           this.itemsRetrieved = true;
+          this.$nextTick(() => {
+            this.$refs.addTodoMsg.focus();
+          });
         })
         .catch(error => {
           this.handleError(error);

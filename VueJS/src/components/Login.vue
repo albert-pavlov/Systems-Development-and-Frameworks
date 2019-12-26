@@ -5,7 +5,7 @@
       <input v-model="user" type="text" placeholder="User" :disabled="submitted" ref="user" />
       <input v-model="pass" type="password" placeholder="Password" :disabled="submitted" />
       <button
-        @click.prevent="submit()"
+        @click.prevent="login()"
         :disabled="(user.length <= 0 || pass.length <= 0 || submitted)"
       >Login</button>
       <p style="color: red">{{errorMsg}}</p>
@@ -32,7 +32,7 @@ export default {
     });
   },
   methods: {
-    submit() {
+    login() {
       this.errorMsg = "";
       this.submitted = true;
       this.$apollo
