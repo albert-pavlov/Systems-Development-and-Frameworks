@@ -1,20 +1,22 @@
 <template>
   <div>
-    <form>
-      <input type="text" v-model="addTodoMsg" ref="addTodoMsg" placeholder="New Todo" />
-      <button @click.prevent="addItem()">Add</button>
-    </form>
-    <ul v-if="(itemsRetrieved && items.length > 0)">
-      <list-item
-        v-for="item in items"
-        v-bind:key="item.id"
-        v-bind:item="item"
-        @done-item="doneItem"
-        @edit-item="editItem"
-        @delete-item="deleteItem"
-      />
-    </ul>
-    <p v-if="(itemsRetrieved && items.length <= 0)">Todo list is empty.</p>
+    <template v-if="itemsRetrieved">
+      <form>
+        <input type="text" v-model="addTodoMsg" ref="addTodoMsg" placeholder="New Todo" />
+        <button @click.prevent="addItem()">Add</button>
+      </form>
+      <ul v-if="(items.length > 0)">
+        <list-item
+          v-for="item in items"
+          v-bind:key="item.id"
+          v-bind:item="item"
+          @done-item="doneItem"
+          @edit-item="editItem"
+          @delete-item="deleteItem"
+        />
+      </ul>
+      <p v-if="(items.length <= 0)">Todo list is empty.</p>
+    </template>
     <p v-if="(!itemsRetrieved)">Loading todos...</p>
     <p style="color: red">{{errorMsg}}</p>
   </div>
@@ -42,9 +44,11 @@ export default {
     this.loadItems();
   },
   mounted() {
-    this.$nextTick(() => {
-      this.$refs.addTodoMsg.focus();
-    });
+    if (this.itemsRetrieved) {
+      this.$nextTick(() => {
+        this.$refs.addTodoMsg.focus();
+      });
+    }
   },
   methods: {
     handleError(error) {
@@ -79,13 +83,16 @@ export default {
     },
     addItem() {
       if (this.addTodoMsg.length <= 0) return;
+      //ui
+      var addTodoMsgTemp = this.addTodoMsg;
+      this.addTodoMsg = "";
       //db
       this.errorMsg = "";
       this.$apollo
         .mutate({
           mutation: require("../graphql/createListItem.gql"),
           variables: {
-            message: this.addTodoMsg,
+            message: addTodoMsgTemp,
             assigneeID: this.userId
           }
         })
@@ -93,7 +100,6 @@ export default {
           const item = result.data.createListItem;
           //ui
           this.items.push(item);
-          this.addTodoMsg = "";
         })
         .catch(error => {
           this.handleError(error);
