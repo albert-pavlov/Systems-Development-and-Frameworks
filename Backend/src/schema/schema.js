@@ -2,13 +2,14 @@ const { gql } = require('apollo-server');
 
 const typeDefs = gql`
     type Query {
-       getJahr(number: Int!, userId: Int!): Jahr!
-       getProfile(userId: Int!): User
+       getJahr(number: Int!, userId: ID!): Jahr!
+       getProfile(userId: ID!): User
     }
 
     type Mutation {
-
-        setWorkAndDuration(work: String!, duration: Int!): String! #confirmation or error message
+        #only for self
+        setWorkAndDuration(work: String!, duration: Int!, userId: ID!): String! #confirmation or error message
+        
         login(usr: String!, pwd: String!): [String!] # token and IDs
     }
 
@@ -29,9 +30,10 @@ const typeDefs = gql`
     }
 
     type User {
+        id: ID!
         firstname: String!
         lastname: String!
-        wage: Int! #Stundentlohn
+        wage: Int! #Stundentlohn //Euro pro Std 10
         age: Int!
         maritalStatus: String!
     }
