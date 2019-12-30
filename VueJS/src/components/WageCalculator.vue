@@ -13,16 +13,20 @@
       @click="selectMonth(index)"
       :disabled="(selYear == curYear && (index + 1) > curMonth)"
     >{{month}}</button>
-    <p>Ausgewählter Monat: {{selMonth}}</p>
+    <p>Ausgewählter Monat: {{months[selMonth - 1]}}</p>
+    <p v-if="(!itemsRetrieved)">Lade Daten...</p>
     <list
       v-if="itemsRetrieved"
-      v-bind:itemsIn="loadItems()"
+      v-bind:itemsIn="items"
       v-bind:dayIn="curDay"
       v-bind:allowEditIn="allowEdit"
       v-on="$listeners"
       @handle-error="handleError"
+      @calculate-wage="calculateWage"
     />
-    <p v-if="(!itemsRetrieved)">Lade Daten...</p>
+    <b>
+      <p v-if="itemsRetrieved">Summe: {{totalDuration}}h x {{hourWage}}€ = {{totalWage}}€</p>
+    </b>
     <p style="color: red">{{errorMsg}}</p>
   </div>
 </template>
@@ -39,11 +43,13 @@ export default {
   data() {
     return {
       dummy: [
-        { number: 23, work: "arbeit_2", duration: 1 },
+        { number: 23, work: "arbeit_2", duration: 2 },
+        { number: 29, work: "arbeit_5", duration: 6 },
         { number: 1, work: "arbeit_1", duration: 3 },
         { number: 30, work: "arbeit_3", duration: 7 },
-        { number: 31, work: "arbeit_4", duration: 10 }
+        { number: 31, work: "arbeit_4", duration: 1 }
       ],
+      items: [],
       months: [
         "Januar",
         "Februar",
@@ -67,7 +73,10 @@ export default {
       userName: Settings.get(Key.UserName),
       itemsRetrieved: false,
       errorMsg: "",
-      allowEdit: false
+      allowEdit: false,
+      totalWage: 0,
+      hourWage: 10,
+      totalDuration: 0
     };
   },
   created() {
@@ -76,6 +85,7 @@ export default {
     this.selYear = this.curYear;
     this.curMonth = date.getMonth() + 1;
     this.curDay = date.getDate();
+    this.loadItems();
   },
   methods: {
     selectMonth(index) {
@@ -83,6 +93,9 @@ export default {
       this.loadItems();
     },
     selectYear() {
+      if (this.selYear == this.curYear && this.selMonth > this.curMonth) {
+        this.selMonth = this.curMonth;
+      }
       this.loadItems();
     },
     handleError(error) {
@@ -105,16 +118,25 @@ export default {
       this.allowEdit =
         this.selYear == this.curYear && this.selMonth == this.curMonth;
       const daysInMonth = new Date(this.selYear, this.selMonth, 0).getDate();
-      var arr = [];
+      var finalArr = [];
       for (let i = 0; i < daysInMonth; i++) {
-        arr.push({ number: i + 1, work: null, duration: 0 });
+        finalArr.push({ number: i + 1, work: null, duration: 0 });
       }
-      var res = this.dummy;
-      for (let i = 0; i < res.length; i++) {
-        arr[i.number - 1] = res[i];
+      var queryArr = this.dummy;
+      for (let i = 0; i < queryArr.length; i++) {
+        if (queryArr[i].number <= daysInMonth) {
+          finalArr[queryArr[i].number - 1] = queryArr[i];
+        }
       }
-      this.items = res;
-      this.$apollo
+      for (let i = finalArr.length - 1; i >= 0; i--) {
+        const weekDay = new Date(this.selYear, this.selMonth, i + 1).getDay();
+        if (weekDay == 2 || weekDay == 3) {
+          finalArr.splice(i, 1);
+        }
+      }
+      this.items = finalArr;
+      this.calculateWage();
+      return this.$apollo
         .query({
           query: require("../graphql/getAssignedListItems.gql"),
           variables: {
@@ -128,6 +150,15 @@ export default {
         .catch(error => {
           this.handleError(error);
         });
+    },
+    calculateWage() {
+      this.totalWage = 0;
+      this.hourlyWage = 0;
+      this.totalDuration = 0;
+      for (let i = 0; i < this.items.length; i++) {
+        this.totalDuration += this.items[i].duration;
+      }
+      this.totalWage = this.totalDuration * this.hourWage;
     }
   }
 };

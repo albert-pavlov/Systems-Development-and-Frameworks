@@ -24,9 +24,9 @@ export default {
     ListItem
   },
   props: {
-    itemsIn: { type: Array, required: true },
-    dayIn: { type: Number, required: true },
-    allowEditIn: { type: Boolean, required: true }
+    itemsIn: { type: Array },
+    dayIn: { type: Number },
+    allowEditIn: { type: Boolean }
   },
   data() {
     return {
@@ -39,6 +39,7 @@ export default {
       this.$emit("handle-error", error);
     },
     editItem(item) {
+      this.$emit("calculate-wage");
       //db
       this.errorMsg = "";
       this.$apollo
@@ -55,9 +56,7 @@ export default {
         });
     },
     clearItem(item) {
-      //ui
-      item.work = null;
-      item.duration = 0;
+      this.$emit("calculate-wage");
       //db
       this.errorMsg = "";
       this.$apollo

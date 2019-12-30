@@ -1,13 +1,6 @@
 <template>
   <div>
-    <h1>Hello!</h1>
-    <b>
-      <p>
-        User Name: {{userName}}
-        <br />
-        User ID: {{userId}}
-      </p>
-    </b>
+    <h1>Hallo {{userName}} (ID: {{userId}})!</h1>
     <button @click="(showWageCalculator = true)">Lohnrechner</button>
     <button @click="(showWageCalculator = false)">Profil</button>
     <p>Ausgewählter Modus: {{showWageCalculator ? "Lohnrechner" : "Profil"}}</p>

@@ -36,9 +36,9 @@
 export default {
   name: "list-item",
   props: {
-    item: { type: Object, required: true },
-    day: { type: Number, required: true },
-    allowEdit: { type: Boolean, required: true }
+    item: { type: Object },
+    day: { type: Number },
+    allowEdit: { type: Boolean }
   },
   data() {
     return {
@@ -50,6 +50,7 @@ export default {
   methods: {
     editModeStart() {
       this.editWorkMsg = this.item.work != null ? this.item.work : "";
+      this.editDurationMsg = this.item.duration;
       this.editMode = true;
       this.$nextTick(() => {
         this.$refs.editWorkMsg.focus();
@@ -67,6 +68,8 @@ export default {
       this.$emit("edit-item", this.item);
     },
     clearItem() {
+      this.item.work = null;
+      this.item.duration = 0;
       this.$emit("clear-item", this.item);
     }
   }
