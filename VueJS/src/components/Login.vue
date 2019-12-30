@@ -2,8 +2,8 @@
   <div>
     <form>
       <h1>Login</h1>
-      <input v-model="user" type="text" placeholder="User" :disabled="submitted" ref="user" />
-      <input v-model="pass" type="password" placeholder="Password" :disabled="submitted" />
+      <input v-model="user" type="text" placeholder="Nutzer" :disabled="submitted" ref="user" />
+      <input v-model="pass" type="password" placeholder="Passwort" :disabled="submitted" />
       <button
         @click.prevent="login()"
         :disabled="(user.length <= 0 || pass.length <= 0 || submitted)"

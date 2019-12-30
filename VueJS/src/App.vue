@@ -4,25 +4,26 @@
       <login @toggle-logged-in="toggleLoggedIn" />
     </template>
     <template v-else>
-      <todos @toggle-logged-in="toggleLoggedIn" />
+      <home @toggle-logged-in="toggleLoggedIn" />
     </template>
   </div>
 </template>
 
 <script>
-import { Settings, Key } from "./settings.js";
+//import { Settings, Key } from "./settings.js";
 import Login from "./components/Login.vue";
-import Todos from "./components/Todos.vue";
+import Home from "./components/Home.vue";
 
 export default {
   name: "app",
   components: {
     Login,
-    Todos
+    Home
   },
   data() {
     return {
-      loggedIn: Settings.get(Key.AuthToken) != null
+      //loggedIn: (Settings.get(Key.AuthToken) != null),
+      loggedIn: true
     };
   },
   methods: {
