@@ -52,7 +52,7 @@ export default {
           }
         })
         .catch(error => {
-          this.handleError(error);
+          this.handleError("[Wage Item Data] " + error);
         });
     },
     clearItem(item) {
@@ -67,7 +67,7 @@ export default {
           }
         })
         .catch(error => {
-          this.handleError(error);
+          this.handleError("[Wage Item Data] " + error);
         });
     }
   }
