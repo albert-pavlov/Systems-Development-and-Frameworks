@@ -8,7 +8,6 @@
         v-bind:day="dayIn"
         v-bind:allowEdit="allowEditIn"
         @edit-item="editItem"
-        @clear-item="clearItem"
       />
     </ul>
   </div>
@@ -40,30 +39,14 @@ export default {
     },
     editItem(item) {
       this.$emit("calculate-wage");
-      //db
       this.errorMsg = "";
       this.$apollo
         .mutate({
-          mutation: require("../graphql/updateListItem.gql"),
+          mutation: require("../graphql/setWorkAndDuration.gql"),
           variables: {
-            id: item.id,
-            userId: this.userId,
-            message: item.message
-          }
-        })
-        .catch(error => {
-          this.handleError(error);
-        });
-    },
-    clearItem(item) {
-      this.$emit("calculate-wage");
-      //db
-      this.errorMsg = "";
-      this.$apollo
-        .mutate({
-          mutation: require("../graphql/deleteListItem.gql"),
-          variables: {
-            id: item.id
+            work: item.work,
+            duration: Number(item.duration),
+            userId: this.userId
           }
         })
         .catch(error => {

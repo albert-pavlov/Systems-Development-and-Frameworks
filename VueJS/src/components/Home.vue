@@ -4,6 +4,7 @@
       <h1>Hallo {{userName}} (ID: {{userId}})!</h1>
       <button @click="(showWageCalculator = true)">Lohnrechner</button>
       <button @click="(showWageCalculator = false)">Profil</button>
+      <button @click="$emit('toggle-logged-in')">Logout</button>
       <p>Ausgewählter Modus: {{showWageCalculator ? "Lohnrechner" : "Profil"}}</p>
       <div v-show="showWageCalculator">
         <wage-calculator v-on="$listeners" @handle-error="handleError" />
@@ -33,16 +34,12 @@ export default {
   data() {
     return {
       showWageCalculator: true,
-      userData: {
-        //dummy
-        id: 1,
-        firstname: "Test",
-        lastname: "User"
-      },
+      userData: [],
       userId: Settings.get(Key.UserId),
-      userName: "Testuser", //change later to first/last-name
+      userName: Settings.get(Key.UserName),
       userDataRetrieved: false,
-      errorMsg: ""
+      errorMsg: "",
+      errorMsgNoAuthShown: false
     };
   },
   created() {
@@ -55,27 +52,29 @@ export default {
       var noAuthStr = "Not Authorised!";
       if (String(error).match(noAuthStr + "$") == noAuthStr) {
         Settings.set(Key.AuthToken, null);
-        this.errorMsg +=
-          " Logged out from the session. You will be redirected to the login page in a few seconds.";
+        if (!this.errorMsgNoAuthShown) {
+          this.errorMsgNoAuthShown = true;
+          this.errorMsg +=
+            " Logged out from the session. You will be redirected to the login page in a few seconds.";
+        }
         setTimeout(() => {
           this.$emit("toggle-logged-in");
         }, 5000);
       }
     },
     loadUserData() {
-      //query: getprofile -> fill this.userData
       this.errorMsg = "";
       this.userDataRetrieved = false;
       return this.$apollo
         .query({
-          query: require("../graphql/getAssignedListItems.gql"),
+          query: require("../graphql/getProfile.gql"),
           variables: {
-            assigneeID: this.userId
+            userId: this.userId
           }
         })
         .then(result => {
-          //change this.userData
-          this.items = result.data.getAssignedListItems;
+          this.userData = result.data.getProfile;
+          Settings.set(Key.UserWage, this.userData.wage);
           this.userDataRetrieved = true;
         })
         .catch(error => {

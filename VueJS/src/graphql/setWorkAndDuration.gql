@@ -1,0 +1,3 @@
+mutation setWorkAndDuration($work: String!, $duration: Int!, $userId: ID!) {
+  setWorkAndDuration(work: $work, duration: $duration, userId: $userId)
+}

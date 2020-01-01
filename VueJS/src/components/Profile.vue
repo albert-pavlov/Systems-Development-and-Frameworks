@@ -1,6 +1,8 @@
 <template>
   <ul>
-    <li v-for="(value, key, index) in userData" v-bind:key="index">{{key}}: {{value}}</li>
+    <li v-for="(value, key, index) in userData" v-bind:key="index">
+      <div v-if="(key != '__typename')">{{key}}: {{value}}</div>
+    </li>
   </ul>
 </template>
 

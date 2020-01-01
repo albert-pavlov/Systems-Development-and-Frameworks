@@ -99,7 +99,7 @@ const resolvers = {
         setWorkAndDuration: async function(parent, args, context, info) {
             let todayDay = new Date().toLocaleString('en-us', {weekday:'long'});
             let todayDate = new Date().toISOString().slice(0,10);
-            // let todayDate = args.date;
+            //let todayDate = args.date;
 
             // disable 'if' logic for debugging purposes on weekends
             if(todayDay === 'Saturday' || todayDay === 'Sunday') {

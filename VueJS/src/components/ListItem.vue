@@ -19,11 +19,11 @@
       </form>
       <template v-else>
         <p id="item-description">
-          Tag: {{item.number}} |
-          Arbeit: {{item.work != null ? item.work : "null"}} |
+          Tag: {{item.day}} |
+          Arbeit: {{item.work != null && item.work.length > 0 ? item.work : "null"}} |
           Dauer: {{item.duration}}
         </p>
-        <template v-if="(allowEdit && day == item.number)">
+        <template v-if="(allowEdit && day == item.day)">
           <button id="button-edit-start" @click="editModeStart">Editieren</button>
           <button id="button-clear" @click="clearItem">Leeren</button>
         </template>
@@ -68,9 +68,9 @@ export default {
       this.$emit("edit-item", this.item);
     },
     clearItem() {
-      this.item.work = null;
+      this.item.work = "";
       this.item.duration = 0;
-      this.$emit("clear-item", this.item);
+      this.$emit("edit-item", this.item);
     }
   }
 };

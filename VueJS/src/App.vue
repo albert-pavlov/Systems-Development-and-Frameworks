@@ -10,7 +10,7 @@
 </template>
 
 <script>
-//import { Settings, Key } from "./settings.js";
+import { Settings, Key } from "./settings.js";
 import Login from "./components/Login.vue";
 import Home from "./components/Home.vue";
 
@@ -22,13 +22,15 @@ export default {
   },
   data() {
     return {
-      //loggedIn: (Settings.get(Key.AuthToken) != null),
-      loggedIn: true
+      loggedIn: Settings.get(Key.AuthToken) != null
     };
   },
   methods: {
     toggleLoggedIn() {
       this.loggedIn = !this.loggedIn;
+      if (!this.loggedIn) {
+        Settings.set(Key.AuthToken, null);
+      }
     }
   }
 };

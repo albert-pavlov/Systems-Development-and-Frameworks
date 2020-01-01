@@ -1,0 +1,13 @@
+query getJahr($number: Int!, $userId: ID!) {
+  getJahr(number: $number, userId: $userId) {
+    number
+    months {
+      number
+      days {
+        day
+        work
+        duration
+      }
+    }
+  }
+}
