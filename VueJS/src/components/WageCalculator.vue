@@ -68,7 +68,7 @@ export default {
       curYear: 2000,
       selYear: 2000,
       curMonth: 1,
-      selMonth: 12,
+      selMonth: 1,
       curDay: 1,
       userId: Settings.get(Key.UserId),
       userName: Settings.get(Key.UserName),
@@ -85,6 +85,7 @@ export default {
     this.curYear = date.getFullYear();
     this.selYear = this.curYear;
     this.curMonth = date.getMonth() + 1;
+    this.selMonth = this.curMonth;
     this.curDay = date.getDate();
     this.loadItems();
   },

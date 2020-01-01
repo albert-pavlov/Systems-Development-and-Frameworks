@@ -36,7 +36,7 @@ export default {
   },
   methods: {
     handleError(error) {
-      this.$emit("handle-error", error);
+      this.$emit("handle-error", "[Wage Item Data] " + error);
     },
     editItem(item) {
       this.$emit("calculate-wage");
@@ -52,7 +52,7 @@ export default {
           }
         })
         .catch(error => {
-          this.handleError("[Wage Item Data] " + error);
+          this.handleError(error);
         });
     },
     clearItem(item) {
@@ -67,7 +67,7 @@ export default {
           }
         })
         .catch(error => {
-          this.handleError("[Wage Item Data] " + error);
+          this.handleError(error);
         });
     }
   }
