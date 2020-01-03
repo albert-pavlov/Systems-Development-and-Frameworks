@@ -25,7 +25,7 @@
       @calculate-wage="calculateWage"
     />
     <b>
-      <p v-if="itemsRetrieved">Summe: {{totalDuration}}h x {{hourWage}}€ = {{totalWage}}€</p>
+      <p v-if="itemsRetrieved">Summe: {{totalDuration}}h x {{hourlyWage}}€ = {{totalWage}}€</p>
     </b>
     <p style="color: red">{{errorMsg}}</p>
   </div>
@@ -50,6 +50,7 @@ export default {
         { number: 31, work: "arbeit_4", duration: 1 }
       ],
       items: [],
+      userData: null,
       months: [
         "Januar",
         "Februar",
@@ -67,7 +68,7 @@ export default {
       curYear: 2000,
       selYear: 2000,
       curMonth: 1,
-      selMonth: 12,
+      selMonth: 1,
       curDay: 1,
       userId: Settings.get(Key.UserId),
       userName: Settings.get(Key.UserName),
@@ -75,7 +76,7 @@ export default {
       errorMsg: "",
       allowEdit: false,
       totalWage: 0,
-      hourWage: 10,
+      hourlyWage: 10,
       totalDuration: 0
     };
   },
@@ -84,6 +85,7 @@ export default {
     this.curYear = date.getFullYear();
     this.selYear = this.curYear;
     this.curMonth = date.getMonth() + 1;
+    this.selMonth = this.curMonth;
     this.curDay = date.getDate();
     this.loadItems();
   },
@@ -101,15 +103,7 @@ export default {
     handleError(error) {
       this.errorMsg = error;
       this.itemsRetrieved = true;
-      var noAuthStr = "Not Authorised!";
-      if (String(error).match(noAuthStr + "$") == noAuthStr) {
-        Settings.set(Key.AuthToken, null);
-        this.errorMsg +=
-          " Logged out from the session. You will be redirected to the login page in a few seconds.";
-        setTimeout(() => {
-          this.$emit("toggle-logged-in");
-        }, 5000);
-      }
+      this.$emit("handle-error", error, true);
     },
     loadItems() {
       this.errorMsg = "";
@@ -136,6 +130,8 @@ export default {
       }
       this.items = finalArr;
       this.calculateWage();
+
+      //query: getJahr
       return this.$apollo
         .query({
           query: require("../graphql/getAssignedListItems.gql"),
@@ -148,17 +144,16 @@ export default {
           this.itemsRetrieved = true;
         })
         .catch(error => {
-          this.handleError(error);
+          this.handleError("[Wage Data] " + error);
         });
     },
     calculateWage() {
       this.totalWage = 0;
-      this.hourlyWage = 0;
       this.totalDuration = 0;
       for (let i = 0; i < this.items.length; i++) {
         this.totalDuration += this.items[i].duration;
       }
-      this.totalWage = this.totalDuration * this.hourWage;
+      this.totalWage = this.totalDuration * this.hourlyWage;
     }
   }
 };

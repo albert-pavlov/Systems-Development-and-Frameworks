@@ -36,7 +36,7 @@ export default {
   },
   methods: {
     handleError(error) {
-      this.$emit("handle-error", error);
+      this.$emit("handle-error", "[Wage Item Data] " + error);
     },
     editItem(item) {
       this.$emit("calculate-wage");
