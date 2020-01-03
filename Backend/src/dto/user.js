@@ -1,16 +1,10 @@
 class User {
-    constructor(id, name, password) {
+    constructor(id, name, password, wage) {
         this.id = id;
         this.name = name;
         this.password = password;
+        this.wage = wage;
     }
 }
 
-class UserInfo {
-    constructor(id, name) {
-        this.id = id;
-        this.name = name;
-    }
-}
-
-module.exports = { User, UserInfo };
+module.exports =  User;

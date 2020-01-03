@@ -6,9 +6,9 @@ async function seedUsers(session, id) {
             
         let result = await txc.run(
         `
-        CREATE(user:User {id:$id, name:$name, pwd:$pwd})
+        CREATE(user:User {id:$id, name:$name, pwd:$pwd, wage: $wage})
         `,
-            { id: Number(users[id].id), name: users[id].name, pwd: users[id].password },
+            { id: Number(users[id].id), name: users[id].name, pwd: users[id].password, wage: users[id].wage },
         )
         if (result != null) {
             return result.records.map(record => ({
@@ -74,10 +74,6 @@ async function seedListItems(session, listItemId) {
 
     try {    
         await seedUsers(session, 0)
-        await seedUsers(session, 1)
-        await seedUsers(session, 2)
-        await seedUsers(session, 3)
-        await seedUsers(session, 4)
         
         await seedListItems(session, 0)
         await seedListItems(session, 1)

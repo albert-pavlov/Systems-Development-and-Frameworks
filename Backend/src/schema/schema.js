@@ -7,10 +7,10 @@ const typeDefs = gql`
     }
 
     type Mutation {
-        #only for self
-        setWorkAndDuration(work: String!, duration: Int!, userId: ID!): String! #confirmation or error message
-        
+        createUser(name: String!, pwd: String!, wage: Int!): User
         login(usr: String!, pwd: String!): [String!] # token and IDs
+        setWorkAndDuration(work: String!, duration: Int!, userId: ID!): String!
+        #setWorkAndDuration(date: String!, work: String!, duration: Int!, userId: ID!): String!
     }
 
     type Jahr {
@@ -24,18 +24,15 @@ const typeDefs = gql`
     }
 
     type Tag {
-        number: Int!
-        work: String
-        duration: Int
+        day: Int!
+        work: String!
+        duration: Int!
     }
 
     type User {
         id: ID!
-        firstname: String!
-        lastname: String!
-        wage: Int! #Stundentlohn //Euro pro Std 10
-        age: Int!
-        maritalStatus: String!
+        name: String!
+        wage: Int!
     }
 `;
 

@@ -1,74 +1,16 @@
-const db = require('../db/database');
+const Tag = require('../dto/tag');
+const Monat = require('../dto/monat');
+const Jahr = require('../dto/jahr');
 const utils = require('../utils/utils');
-const { ListItem, ListItemInfo } = require("../dto/listItem");
-const { User, UserInfo } = require('../dto/user');
+const { User } = require('../dto/user');
 const jwtService = require('../jwt/service');
 
 
 const resolvers = {
     Query: {
-        getOneListItem: async function (parent, args, context, info) {
-            let listItemInfo;
-            let listItem;
-            let user;
-
+        getJahr: async function (parent, args, context, info) {
+            let jahr;
             const session = context.driver.session();
-
-            try {
-                let writeTxResultPromise = session.writeTransaction(async txc => {
-                    let result = await txc.run(
-                        `
-                        MATCH (listItem: ListItem { id: $id })
-                        RETURN listItem
-                         `,
-                            { id: Number(args.id) },
-                        )
-                    if (result != null) {
-                        return result.records.map(record => ({
-                            listItem: record.get('listItem').properties,
-                        }))
-                    }
-                    return;
-                })
-                let txResult = await writeTxResultPromise
-
-                listItem = txResult[0] != undefined ? txResult[0].listItem : null;
-                
-                if (listItem != null) {
-                    writeTxResultPromise = session.writeTransaction(async txc => {
-                        result = await txc.run(
-                            `
-                        MATCH (listItem: ListItem { id: $id })
-                        MATCH (user:User)<-[:ASSIGNED]-(listItem)
-                        RETURN user
-                         `,
-                            { id: Number(args.id) },
-                        )
-                        if (result != null) {
-                            return result.records.map(record => ({
-                                user: record.get('user') != undefined ? record.get('user').properties : null
-                            }))
-                        }
-                        return;
-                    })
-                    let txResult = await writeTxResultPromise
-
-                    user = txResult[0] != undefined ? txResult[0].user : null;
-
-                    listItem.assignee = user;
-                    
-                    listItemInfo = new ListItemInfo(listItem);
-                }
-                return listItemInfo;
-            } finally {
-                session.close()
-            }
-        },
-        getAssignedListItems: async function (parent, args, context, info) {
-            let listItems = [];
-            let user;
-
-            const session = context.driver.session()
 
             try {
                 let writeTxResultPromise = session.writeTransaction(async txc => {
@@ -77,7 +19,67 @@ const resolvers = {
                     MATCH (user: User { id: $id })                          
                     RETURN user
                         `,
-                        { id: args.assigneeID != null ? Number(args.assigneeID) : null }
+                        { id: Number(args.userId) },
+                    )
+                    if (result != null) {
+                        return result.records.map(record => ({
+                            user: record.get('user') != undefined ? record.get('user').properties : null
+                        }))
+                    }
+                })
+                let txResult = await writeTxResultPromise
+                user = txResult[0] != undefined ? txResult[0].user : null;
+
+                if(user != null) {
+                    writeTxResultPromise = session.writeTransaction(async txc => {
+                        result = await txc.run(
+                        `
+                        MATCH(user: User {id: $id})
+                        MATCH(user)-[:HAS_WORKED_ON]->(tag: Tag {year: $year})
+                        RETURN tag
+                        `,
+                            {
+                                id: Number(args.userId),
+                                year: Number(args.number)
+                            }
+                        )
+                        if (result != null) {
+                            return result.records.map(record => ({
+                                tag: record.get('tag') != undefined ? record.get('tag').properties : null
+                            }))
+                        }
+                    })    
+                    txResult = await writeTxResultPromise
+                    jahr = new Jahr(Number(args.number), Array(12).fill(null));
+                    if(txResult != undefined){
+                        txResult.forEach(tag => {
+                           if(jahr.months[tag.tag.month-1] == null) {
+                               monat = new Monat(tag.tag.month, Array(Number(new Date(args.number, tag.tag.month, 0).getDate())).fill(null))
+                               monat.days[tag.tag.day-1] = new Tag(tag.tag.id, Number(tag.tag.day), Number(tag.tag.month), Number(tag.tag.year), tag.tag.work, tag.tag.duration);
+                               jahr.months[tag.tag.month-1] = monat;
+                           } else {
+                            jahr.months[tag.tag.month-1].days[tag.tag.day-1] =  new Tag(tag.tag.id, Number(tag.tag.day), Number(tag.tag.month), Number(tag.tag.year), tag.tag.work, tag.tag.duration);
+                           }
+                        })
+                    }
+                    return jahr;
+                } else {
+                    throw new Error('Wrong user id.');
+                } 
+            } finally {
+                session.close();
+            }
+        },
+        getProfile: async function (parent, args, context, info) {
+            const session = context.driver.session();
+            try {
+                let writeTxResultPromise = session.writeTransaction(async txc => {
+                    let result = await txc.run(
+                    `
+                    MATCH (user: User { id: $id })                          
+                    RETURN user
+                        `,
+                        { id: Number(args.userId) },
                     )
                     if (result != null) {
                         return result.records.map(record => ({
@@ -87,87 +89,163 @@ const resolvers = {
                     return;
                 })
                 let txResult = await writeTxResultPromise
-                user = txResult[0] != undefined ? txResult[0].user : null;
+                return  txResult[0] != undefined ? txResult[0].user : null;
+            } finally {
+                session.close()
+            }
+        }     
+    },
+    Mutation: {        
+        setWorkAndDuration: async function(parent, args, context, info) {
+            let todayDay = new Date().toLocaleString('en-us', {weekday:'long'});
+            let todayDate = new Date().toISOString().slice(0,10);
+            // let todayDate = args.date;
 
-                if(user!=null) {
-                    writeTxResultPromise = session.writeTransaction(async txc => {
-                        result = await txc.run(                           
+            // disable 'if' logic for debugging purposes on weekends
+            if(todayDay === 'Saturday' || todayDay === 'Sunday') {
+                throw new Error('Booking work on weekends is not allowed.')
+            } else {
+                const session = context.driver.session()
+
+                try {
+                    let writeTxResultPromise = session.writeTransaction(async txc => {
+                        let result = await txc.run(
                         `
-                        MATCH(u:User {id: $id})
-                        MATCH (u)-[:ASSIGNED]-(li:ListItem)
-                        RETURN(li)
+                        MATCH (user: User { id: $id })                          
+                        RETURN user
+                            `,
+                            { id: Number(args.userId) },
+                        )
+                        if (result != null) {
+                            return result.records.map(record => ({
+                                user: record.get('user') != undefined ? record.get('user').properties : null
+                            }))
+                        }
+                    })
+                    let txResult = await writeTxResultPromise
+                    user = txResult[0] != undefined ? txResult[0].user : null;
+                    
+                if(user != null) {
+                    writeTxResultPromise = session.writeTransaction(async txc => {
+                        result = await txc.run(
+                        `
+                        MATCH(tag: Tag {day: $day, month: $month, year: $year})
+                        RETURN tag
                         `,
-                            { 
-                                id: user.id 
+                            {   
+                                day: Number(todayDate.split('-')[2]),
+                                month: Number(todayDate.split('-')[1]),
+                                year: Number(todayDate.split('-')[0])                               
                             }
                         )
                         if (result != null) {
                             return result.records.map(record => ({
-                                li: record.get('li') != undefined ? record.get('li').properties : null
+                                tag: record.get('tag') != undefined ? record.get('tag').properties : null
                             }))
-                        }                            
+                        }
                     })
-                    txResult = await writeTxResultPromise;
-                    if(txResult != undefined){
-                        txResult.forEach(listItem => {
-                            listItems.push(listItem.li)
-                        })
-                    }
-                    if(listItems.length != 0) {
-                        listItems.forEach(li => {
-                            li.assignee = user;
-                        })
-                    }
-                    return listItems;
+                    txResult = await writeTxResultPromise
+                    isTagAlreadyBooked = txResult[0] != undefined ? txResult[0].tag : null;
 
-                } else {
-                    return new Error('User with such ID doesn\'t exist.');
+                    if(isTagAlreadyBooked == null) {
+                        writeTxResultPromise = session.writeTransaction(async txc => {
+                            result = await txc.run(
+                            `
+                            MATCH(N:Tag)  
+                            RETURN N.id AS largestID
+                            ORDER BY N.id DESCENDING 
+                            LIMIT 1
+                            `)
+                            if (result != null) {
+                                return result.records.map(record => ({
+                                    largestID: record.get('largestID')
+                                }))
+                            }
+                            return;
+                        })
+                        txResult = await writeTxResultPromise;
+
+                        largestID = txResult[0] == undefined ? 0 : txResult[0].largestID; 
+
+                        writeTxResultPromise = session.writeTransaction(async txc => {
+                            result = await txc.run(
+                            `
+                            CREATE(tag: Tag {id: $id, day: $day, month: $month, year: $year, work: $work, duration: $duration})
+                            `,
+                                {   
+                                    id: Number(largestID+1),
+                                    day: Number(todayDate.split('-')[2]),
+                                    month: Number(todayDate.split('-')[1]),
+                                    year: Number(todayDate.split('-')[0]),
+                                    work: args.work,
+                                    duration: Number(args.duration)
+                                }
+                            )
+                            if (result != null) {
+                                return result.records.map(record => ({
+                                    tag: record.get('tag') != undefined ? record.get('tag').properties : null
+                                }))
+                            }
+                        })
+                        txResult = await writeTxResultPromise
+                        
+                        writeTxResultPromise = session.writeTransaction(async txc => {
+                            result = await txc.run(
+                            `
+                            MATCH(user: User {id: $id})
+                            MATCH(tag: Tag {id: $tagId})
+                            CREATE (user)-[:HAS_WORKED_ON]->(tag)
+                            `,
+                                {
+                                    id: Number(args.userId),
+                                    tagId: Number(largestID+1)
+                                }
+                            )
+                            if (result != null) {
+                                return result.records.map(record => ({
+                                    tag: record.get('tag') != undefined ? record.get('tag').properties : null
+                                }))
+                            }
+                        })    
+                        txResult = await writeTxResultPromise
+
+                        return 'Your workload for today was successfully booked.'   
+                    } else {
+                        writeTxResultPromise = session.writeTransaction(async txc => {
+                            result = await txc.run(
+                            `
+                            MATCH(tag: Tag {day: $day, month: $month, year: $year})
+                            SET tag.work = $work, tag.duration = $duration
+                            `,
+                                {   
+                                    day: Number(todayDate.split('-')[2]),
+                                    month: Number(todayDate.split('-')[1]),
+                                    year: Number(todayDate.split('-')[0]),
+                                    work: args.work,
+                                    duration: Number(args.duration)                               
+                                }
+                            )
+                            if (result != null) {
+                                return result.records.map(record => ({
+                                    tag: record.get('tag') != undefined ? record.get('tag').properties : null
+                                }))
+                            }
+                        })
+                        txResult = await writeTxResultPromise
+    
+                        return 'Your workload for today was successfully updated.' 
+                    }                     
+                    } else {
+                        throw new Error('Wrong user id.');
+                    }
+                }
+                finally {
+                    session.close();
                 }
             }
-            finally {
-                session.close();
-            }
-        },        
-        getAllListItems: async function(parent, args, context, info) {
-            let allListItems = [];
-            const session = context.driver.session();
 
-            cypher = 'MATCH(allListItems: ListItem) ';
-            if(typeof(args.isDone) === 'boolean') {
-                cypher+= 'WHERE(allListItems.isDone = '+ args.isDone +') ';
-            }
-            cypher+= 'RETURN allListItems '
-            if(utils.ORDERBY.asc === args.orderBy || utils.ORDERBY.desc === args.orderBy) {
-                cypher+= 'ORDER BY (allListItems.createdAt) ' + args.orderBy;
-            }
-            try {
-                let writeTxResultPromise = session.writeTransaction(async txc => {
-                    let result = await txc.run(cypher)
-                    if (result != null) {
-                        return result.records.map(record => ({
-                            allListItems: record.get('allListItems').properties
-                        }))
-                    }
-                    return;
-                })
-                let txResult = await writeTxResultPromise
-                if(txResult != undefined) {
-                    txResult.forEach( res => {
-                        allListItems.push(res.allListItems)
-                    })
-                }
-
-                allListItems.forEach(listItem => {
-                    listItem.assignee = !null;
-                })
-
-                return allListItems;
-            } finally {
-                session.close()
-            }
-        }        
-    },
-    Mutation: {
+        }
+        ,
         login: async function (parent, args, context, info) {
             if (args.usr != "" && args.usr != null && args.usr != undefined && args.pwd != "" && args.pwd != null && args.pwd != undefined) {
 
@@ -208,409 +286,6 @@ const resolvers = {
                 }
             }
         },
-        createListItem: async function(parent, args, context, info) {
-            if(args.message != "" && args.message != null && args.message != undefined) {
-
-                let listItem;
-                let user;
-
-                const session = context.driver.session()
-
-                try {
-                    let writeTxResultPromise = session.writeTransaction(async txc => {
-                        let result = await txc.run(
-                        `
-                        MATCH (user: User { id: $id })                          
-                        RETURN user
-                         `,
-                            { id: args.assigneeID != null ? Number(args.assigneeID) : null },
-                        )
-                        if (result != null) {
-                            return result.records.map(record => ({
-                                user: record.get('user').properties
-                            }))
-                        }
-                        return;
-                    })
-                    let txResult = await writeTxResultPromise
-                    user = txResult[0] != undefined ? txResult[0].user : null;
-                
-                    writeTxResultPromise = session.writeTransaction(async txc => {
-                        result = await txc.run(
-                        `
-                        MATCH(N:ListItem)  
-                        RETURN N.id AS largestID
-                        ORDER BY N.id DESCENDING 
-                        LIMIT 1
-                        `)
-                        if (result != null) {                           
-                            return result.records.map(record => ({
-                                largestID: record.get('largestID')
-                            }))
-                        }
-                        return;
-                    })
-
-                    txResult = await writeTxResultPromise;
-                    largestID = txResult[0] == undefined ? 1 : txResult[0].largestID;
-                    let newLargestId = utils.generateRandomId(largestID);                        
-                    writeTxResultPromise = session.writeTransaction(async txc => {
-                        result = await txc.run(                           
-                        `
-                        CREATE(listItem: ListItem {
-                            id: $id, 
-                            message: $message, 
-                            isDone: $isDone, 
-                            createdAt: $createdAt  
-                        })
-                        RETURN listItem {.*}
-                        `,
-                            { 
-                                id: newLargestId, 
-                                message: args.message, 
-                                isDone: false,
-                                createdAt: ((new Date).getTime()).toString()
-                            }
-                        )
-                        if (result != null) {                                
-                            return result.records.map(record => ({
-                                listItem: record.get('listItem')
-                            }))
-                        }
-                        return;
-                    })
-                    txResult = await writeTxResultPromise;
-                    listItem = txResult[0].listItem;
-
-                    if(user!=null) {
-                        writeTxResultPromise = session.writeTransaction(async txc => {
-                            result = await txc.run(                           
-                            `
-                            MATCH(u:User { id: $uId })
-                            MATCH(li:ListItem { id: $liId})
-                            CREATE (u)<-[:ASSIGNED]-(li)
-                            `,
-                                { 
-                                    uId: user.id, 
-                                    liId: newLargestId
-                                }
-                            )                            
-                        })
-                        txResult = await writeTxResultPromise;
-
-                        listItem.assignee = user;                            
-                        return listItem;
-
-                    } else {
-                        return listItem;
-                    }
-                }
-                finally {
-                    session.close();
-                }
-            }
-            return;
-        },
-        assignListItem: async function (parent, args, context, info) {
-            let listItem;
-            let user;
-
-            const session = context.driver.session()
-
-            try {
-                // check if such list item exists
-                let writeTxResultPromise = session.writeTransaction(async txc => {
-                    let result = await txc.run(
-                        `
-                        MATCH(listItem: ListItem { id: $id })                        
-                        RETURN listItem
-                 `,
-                        { 
-                            id: Number(args.id)
-                        },
-                    )
-                    if (result != null) {
-                        return result.records.map(record => ({
-                            listItem: record.get('listItem').properties
-                        }))
-                    }
-                    return;
-                })
-                let txResult = await writeTxResultPromise
-                listItem = txResult[0]!= undefined ? txResult[0].listItem : null;
-
-                // check if the user whom the list item will be assigned to exists
-                writeTxResultPromise = session.writeTransaction(async txc => {
-                    result = await txc.run(
-                        `
-                        MATCH(user:User { id: $id})
-                        RETURN user
-                 `,
-                        {
-                            id: Number(args.assigneeID)
-                        },
-                    )
-                    if (result != null) {
-                        return result.records.map(record => ({
-                            user: record.get('user').properties
-                        }))
-                    }
-                    return;
-                })
-                txResult = await writeTxResultPromise
-                user = txResult[0]!= undefined ? txResult[0].user : null;         
-
-                if (listItem != null) {
-                    if (user != null) {                                                
-                        // delete the relation between the list item and the current assignee
-                        // multiple assignments of a single list item are not allowed
-                        writeTxResultPromise = session.writeTransaction(async txc => {
-                            result = await txc.run(
-                                `
-                                MATCH(listItem: ListItem { id: $id })
-                                MATCH(listItem)-[r]->(:User)
-                                DELETE(r)
-                            `,
-                                {
-                                    id: Number(args.id)
-                                },
-                            )
-                        })
-                        txResult = await writeTxResultPromise
-                        
-                        // reassign the list item to the new user
-                        // multiple assignments of a single list item are not allowed
-                        writeTxResultPromise = session.writeTransaction(async txc => {
-                            result = await txc.run(
-                                `
-                                MATCH(listItem: ListItem { id: $liId })
-                                MATCH(user: User { id: $uId})
-                                MERGE (user)<-[:ASSIGNED]-(listItem)
-                                RETURN listItem, user
-                                `,
-                                {
-                                    liId: Number(args.id),
-                                    uId: Number(args.assigneeID)
-                                },
-                            )
-                            if (result != null) {
-                                return result.records.map(record => ({
-                                    listItem: record.get('listItem').properties,
-                                    user: record.get('user').properties,
-                                }))
-                            }
-                            return;
-                        })
-                        txResult = await writeTxResultPromise
-                        listItem = txResult[0].listItem;
-                        user = txResult[0].user;
-                        listItem.assignee = user;
-
-                        return listItem;
-                    } else {
-                        throw new Error('Assignee with such ID doesn\'t exist.');
-                    }
-                } else {
-                    throw new Error('List item with such ID doesn\'t exist.');
-                }
-            } finally {
-                session.close()
-            }
-        },
-        updateListItem: async function (parent, args, context, info) {
-            let listItem;
-            let user;
-
-            const session = context.driver.session()
-            try {
-                // check if such list item exists
-                let writeTxResultPromise = session.writeTransaction(async txc => {
-                    let result = await txc.run(
-                        `
-                        MATCH(listItem: ListItem { id: $id })                        
-                        RETURN listItem
-                 `,
-                        { 
-                            id: Number(args.id)
-                        },
-                    )
-                    if (result != null) {
-                        return result.records.map(record => ({
-                            listItem: record.get('listItem') != undefined ? record.get('listItem').properties : null
-                        }))
-                    }
-                    return;
-                })
-                let txResult = await writeTxResultPromise
-                listItem = txResult[0] != undefined ? txResult[0].listItem : null;
-
-                writeTxResultPromise = session.writeTransaction(async txc => {
-                    result = await txc.run(
-                        `
-                        MATCH(listItem: ListItem { id: $id })
-                        MATCH(user:User)-[:ASSIGNED]-(listItem)
-                        RETURN user
-                 `,
-                        {
-                            id: Number(args.id)
-                        },
-                    )
-                    if (result != null) {
-                        return result.records.map(record => ({
-                            user: record.get('user') != undefined ? record.get('user').properties : null
-                        }))
-                    }
-                    return;
-                })
-                txResult = await writeTxResultPromise
-                user = txResult[0] != undefined ? txResult[0].user : null;         
-
-                if (listItem != null) {
-                    if (user != null) {  
-                        if(user.id == args.userId) {                                              
-                            writeTxResultPromise = session.writeTransaction(async txc => {
-                                result = await txc.run(
-                                    `
-                                    MATCH(listItem: ListItem { id: $id })
-                                    SET listItem.message = $message
-                                    RETURN listItem 
-                                `,
-                                    {
-                                        id: Number(args.id),
-                                        message: args.message
-                                    },
-                                )
-                                if (result != null) {
-                                    return result.records.map(record => ({
-                                        listItem: record.get('listItem') != undefined ? record.get('listItem').properties : null
-                                    }))
-                                }  
-                            })
-                            txResult = await writeTxResultPromise
-                            
-                            updatedListItem = txResult[0] != undefined ? txResult[0].listItem : null ;
-                            updatedListItem. assignee = user;
-                            return updatedListItem;
-                        } else {
-                            throw new Error('Updating only allowed for list items assigned to self.');
-                        }
-                    } else {
-                        throw new Error('Assignee with such ID doesn\'t exist.');
-                    }
-                } else {
-                    throw new Error('List item with such ID doesn\'t exist.');
-                }
-            } finally {
-                session.close()
-            }
-        },  
-        finishListItem: async function(parent, args, context, info) {
-                let listItemInfo;               
-                let listItem;
-                let user;
-
-                const session = context.driver.session();
-
-                try {
-                    let writeTxResultPromise = session.writeTransaction(async txc => {
-                        let result = await txc.run(
-                        `
-                        MATCH (listItem: ListItem { id: $id })
-                        MATCH (user:User)<-[:ASSIGNED]-(listItem)
-                        SET listItem.isDone = true                          
-                        RETURN listItem, user
-                         `,
-                            { id: Number(args.id) },
-                        )
-                        if (result != null) {
-                            return result.records.map(record => ({
-                                listItem: record.get('listItem').properties,
-                                user: record.get('user').properties
-                            }))
-                        }
-                        return;
-                    })
-                    let txResult = await writeTxResultPromise
-
-                    listItem = txResult[0] != undefined ? txResult[0].listItem : null;
-                    user = txResult[0] != undefined ? txResult[0].user : null;
-                    if(listItem != null) {
-                        listItem.assignee = user;                    
-                        listItemInfo = new ListItemInfo(listItem);
-                    } 
-
-                    return listItemInfo;
-                } finally {
-                    session.close()
-                }
-        },
-        deleteListItem: async function (parent, args, context, info) {
-            let listItemInfo;
-            let listItem;
-            let user;
-
-            const session = context.driver.session();
-
-            try {
-                let writeTxResultPromise = session.writeTransaction(async txc => {
-                    let result = await txc.run(
-                        `
-                        MATCH (listItem: ListItem { id: $id })
-                        RETURN listItem
-                         `,
-                            { id: Number(args.id) },
-                        )
-                    if (result != null) {
-                        return result.records.map(record => ({
-                            listItem: record.get('listItem') != undefined ? record.get('listItem').properties : null
-                        }))
-                    }
-                    return;
-                })
-                let txResult = await writeTxResultPromise
-
-                listItem = txResult[0] != undefined ? txResult[0].listItem : null;
-                
-                if (listItem != null) {
-
-                    writeTxResultPromise = session.writeTransaction(async txc => {
-                        result = await txc.run(
-                            `
-                            MATCH (listItem: ListItem { id: $id })
-                            MATCH (user:User)<-[:ASSIGNED]-(listItem)
-                            RETURN user
-                             `,
-                                { id: Number(args.id) },
-                            )
-                        if (result != null) {
-                            return result.records.map(record => ({
-                                user: record.get('user')!=null ? record.get('user').properties: null
-                            }))
-                        }
-                    })
-                    txResult = await writeTxResultPromise
-    
-                    user = txResult[0] != undefined ? txResult[0].user : null;
-                    writeTxResultPromise = session.writeTransaction(async txc => {
-                        result = await txc.run(
-                            `
-                            MATCH (listItem: ListItem { id: $id })
-                            DETACH DELETE listItem
-                            `,
-                                { id: Number(args.id) },
-                            )
-                    })
-                    txResult = await writeTxResultPromise
-                    if(user!=null) {
-                        listItem.assignee = user;
-                    }
-                    listItemInfo = new ListItemInfo(listItem);
-                    return listItemInfo;
-                } 
-            } finally {
-                session.close()
-            }
-        },
         createUser: async function (parent, args, context, info) {
             if (args.name != "" && args.name != null && args.name != undefined && args.pwd != "" && args.pwd != null && args.pwd != undefined) {
 
@@ -642,7 +317,7 @@ const resolvers = {
                         writeTxResultPromise = session.writeTransaction(async txc => {
                             result = await txc.run(
                             `
-                            MATCH(N:User)  
+                            MATCH(N: User)  
                             RETURN N.id AS largestID
                             ORDER BY N.id DESCENDING 
                             LIMIT 1
@@ -655,18 +330,17 @@ const resolvers = {
                             return;
                         })
 
-                        txResult = await writeTxResultPromise
-                        
-                        largestID = txResult[0] == undefined ? 1 : txResult[0].largestID;
-                        let newLargestId = utils.generateRandomId(largestID); 
+                        txResult = await writeTxResultPromise;
+
+                        largestID = txResult[0] == undefined ? 0 : txResult[0].largestID; 
 
                         writeTxResultPromise = session.writeTransaction(async txc => {
                             result = await txc.run(                           
                             `
-                            CREATE(user: User { id: $id, name: $name, pwd: $pwd})                          
+                            CREATE(user: User { id: $id, name: $name, pwd: $pwd, wage: $wage})                          
                             RETURN user
                             `,
-                                { id: utils.generateRandomId(newLargestId), name: args.name, pwd: args.pwd },
+                                { id: largestID+1, name: args.name, pwd: args.pwd, wage: args.wage },
                             )
                             if (result != null) {                                
                                 return result.records.map(record => ({
@@ -676,9 +350,8 @@ const resolvers = {
                             return;
                         })
                         txResult = await writeTxResultPromise
-                        user = txResult[0].user
-
-                        return new UserInfo(user.id, user.name);
+                        
+                        return txResult[0].user
                     } else {
                         throw new Error('Username already in use. Please select a different one and try again.')
                     }
@@ -688,16 +361,6 @@ const resolvers = {
                 }
             }
             return;
-        }
-    },
-    ListItem: {
-        createdAt: (parent, args, context, info) => {
-            return new Date(Number(parent.createdAt)).toISOString();
-        }
-    },
-    ListItemInfo: {
-        createdAt: (parent, args, context, info) => {
-            return new Date(Number(parent.createdAt)).toISOString();
         }
     }
 };

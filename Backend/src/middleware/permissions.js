@@ -58,22 +58,16 @@ const isAuthenticated = rule({ cache: 'contextual' })(
 const permissions = shield({
     Query: {
         "*": deny,
-        getOneListItem: isAuthenticated,
-        getAssignedListItems: isAuthenticated,
-        getAllListItems: isAuthenticated
+        getProfile: isAuthenticated,
+        getJahr: isAuthenticated
+       
     },
     Mutation: {
         "*": deny,
         login: allow,
         createUser: allow,
-        createListItem: isAuthenticated,
-        assignListItem: isAuthenticated,
-        updateListItem: isAuthenticated,
-        finishListItem: isAuthenticated,
-        deleteListItem: isAuthenticated        
-    },
-    ListItemInfo: isOwner,
-    User: isSelf
+        setWorkAndDuration: isAuthenticated        
+    }
 })
 
 module.exports = permissions;
