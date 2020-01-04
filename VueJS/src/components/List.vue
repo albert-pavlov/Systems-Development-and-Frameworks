@@ -38,6 +38,7 @@ export default {
       this.$emit("handle-error", "[Wage Item Data] " + error);
     },
     editItem(item) {
+      this.$emit("update-year");
       this.$emit("calculate-wage");
       this.errorMsg = "";
       this.$apollo

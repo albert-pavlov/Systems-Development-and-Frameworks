@@ -23,6 +23,7 @@
       v-on="$listeners"
       @handle-error="handleError"
       @calculate-wage="calculateWage"
+      @update-year="loadYearItems"
     />
     <b>
       <p v-if="itemsRetrieved">Summe: {{totalDuration}}h x {{hourlyWage}}€ = {{totalWage}}€</p>
@@ -60,7 +61,6 @@ export default {
       ],
       curYear: 2000,
       selYear: 2000,
-      selYearPrev: 2000,
       curMonth: 1,
       selMonth: 1,
       curDay: 1,
@@ -92,10 +92,7 @@ export default {
       if (this.selYear == this.curYear && this.selMonth > this.curMonth) {
         this.selMonth = this.curMonth;
       }
-      if (this.selYear != this.selYearPrev) {
-        this.selYearPrev = this.selYear;
-        this.loadYearItems();
-      }
+      this.loadYearItems();
     },
     handleError(error) {
       this.errorMsg = error;
