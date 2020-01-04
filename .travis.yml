@@ -9,7 +9,7 @@ env:
 sudo: true
 
 branches:
-  - dev_5_full
+  - dev_5_pairprog
 
 services:
   - neo4j
@@ -33,7 +33,6 @@ script:
   - npm run test
   - cd ../Backend
   - yarn run db:reset
-  - yarn run db:seed
   - yarn run test
 
 after_success:
