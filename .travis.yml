@@ -30,10 +30,8 @@ install:
 script:
   - cd ../VueJS
   - npm run lint
-  - npm run test
   - cd ../Backend
   - yarn run db:reset
-  - yarn run test
 
 after_success:
   - cd ../VueJS
