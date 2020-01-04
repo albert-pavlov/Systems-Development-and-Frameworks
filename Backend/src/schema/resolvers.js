@@ -100,9 +100,9 @@ const resolvers = {
             let todayDay = new Date().toLocaleString('en-us', {weekday:'long'});
             let todayDate = new Date().toISOString().slice(0,10);
             //let todayDate = args.date;
-
+            
             // disable 'if' logic for debugging purposes on weekends
-            if(todayDay === 'Saturday' || todayDay === 'Sunday') {
+            if(/*false*/ todayDay === 'Saturday' || todayDay === 'Sunday') {
                 throw new Error('Booking work on weekends is not allowed.')
             } else {
                 const session = context.driver.session()
