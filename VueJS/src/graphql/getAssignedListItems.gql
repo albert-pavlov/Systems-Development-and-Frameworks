@@ -1,8 +1,0 @@
-query getAssignedListItems($assigneeID: ID!) {
-  getAssignedListItems(assigneeID: $assigneeID) {
-    id
-    message
-    isDone
-    createdAt
-  }
-}

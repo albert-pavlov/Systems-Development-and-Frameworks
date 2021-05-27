@@ -1,8 +1,0 @@
-mutation createListItem($message: String!, $assigneeID: ID) {
-  createListItem(message: $message, assigneeID: $assigneeID) {
-    id
-    message
-    isDone
-    createdAt
-  }
-}

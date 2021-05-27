@@ -2,21 +2,31 @@
   <div>
     <div class="item">
       <form v-if="editMode">
-        <input id="input-edit" ref="editTodoMsg" type="text" v-model="editTodoMsg" />
+        <input
+          id="input-edit"
+          placeholder="Arbeit"
+          ref="editWorkMsg"
+          type="text"
+          v-model="editWorkMsg"
+        />
+        <input id="input-duration" placeholder="Dauer" type="number" v-model="editDurationMsg" />
         <button
           id="button-save"
           @click.prevent="editItem"
-          :disabled="(editTodoMsg.length <= 0)"
-        >Save</button>
-        <button id="button-edit-end" @click="editModeEnd">Cancel</button>
+          :disabled="(editWorkMsg.length <= 0)"
+        >Speichern</button>
+        <button id="button-edit-end" @click="editModeEnd">Abbrechen</button>
       </form>
       <template v-else>
-        <p
-          id="item-description"
-        >Todo | id: {{item.id}} | message: {{item.message}} | isDone: {{item.isDone}} | createdAt: {{item.createdAt}}</p>
-        <button id="button-done" @click="doneItem" :disabled="item.isDone">Done</button>
-        <button id="button-edit-start" @click="editModeStart">Edit</button>
-        <button id="button-delete" @click="deleteItem">Delete</button>
+        <p id="item-description">
+          Tag: {{item.day}} |
+          Arbeit: {{item.work != null && item.work.length > 0 ? item.work : "null"}} |
+          Dauer: {{item.duration}}
+        </p>
+        <template v-if="(allowEdit && day == item.day)">
+          <button id="button-edit-start" @click="editModeStart">Editieren</button>
+          <button id="button-clear" @click="clearItem">Leeren</button>
+        </template>
       </template>
     </div>
   </div>
@@ -26,39 +36,41 @@
 export default {
   name: "list-item",
   props: {
-    item: {
-      type: Object,
-      required: true
-    }
+    item: { type: Object },
+    day: { type: Number },
+    allowEdit: { type: Boolean }
   },
   data() {
     return {
-      editTodoMsg: this.item.message,
+      editWorkMsg: this.item.work,
+      editDurationMsg: this.item.duration,
       editMode: false
     };
   },
   methods: {
-    doneItem() {
-      this.item.isDone = true;
-      this.$emit("done-item", this.item);
-    },
     editModeStart() {
+      this.editWorkMsg = this.item.work != null ? this.item.work : "";
+      this.editDurationMsg = this.item.duration;
       this.editMode = true;
       this.$nextTick(() => {
-        this.$refs.editTodoMsg.focus();
+        this.$refs.editWorkMsg.focus();
       });
     },
     editModeEnd() {
       this.editMode = false;
     },
     editItem() {
-      if (this.editTodoMsg.length <= 0) return;
+      if (this.editWorkMsg.length <= 0) return;
       this.editMode = false;
-      this.item.message = this.editTodoMsg;
+      this.item.work = this.editWorkMsg;
+      this.editDurationMsg = Math.max(0, Math.min(this.editDurationMsg, 8));
+      this.item.duration = this.editDurationMsg;
       this.$emit("edit-item", this.item);
     },
-    deleteItem() {
-      this.$emit("delete-item", this.item);
+    clearItem() {
+      this.item.work = "";
+      this.item.duration = 0;
+      this.$emit("edit-item", this.item);
     }
   }
 };
@@ -71,10 +83,11 @@ p {
 form {
   display: inline-flex;
 }
-button {
-  margin-left: 5px;
-}
 .item {
   margin-top: 5px;
+}
+#item-description,
+input {
+  margin-right: 5px;
 }
 </style>

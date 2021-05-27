@@ -9,7 +9,7 @@ env:
 sudo: true
 
 branches:
-  - dev_5_full
+  - dev_5_pairprog
 
 services:
   - neo4j
@@ -30,11 +30,8 @@ install:
 script:
   - cd ../VueJS
   - npm run lint
-  - npm run test
   - cd ../Backend
   - yarn run db:reset
-  - yarn run db:seed
-  - yarn run test
 
 after_success:
   - cd ../VueJS

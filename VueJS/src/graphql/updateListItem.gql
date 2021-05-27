@@ -1,6 +1,0 @@
-mutation updateListItem($id: ID!, $userId: ID!, $message: String!) {
-  updateListItem(id: $id, userId: $userId, message: $message) {
-    id
-    message
-  }
-}

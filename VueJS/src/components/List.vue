@@ -1,24 +1,15 @@
 <template>
   <div>
-    <template v-if="itemsRetrieved">
-      <form>
-        <input type="text" v-model="addTodoMsg" ref="addTodoMsg" placeholder="New Todo" />
-        <button @click.prevent="addItem()">Add</button>
-      </form>
-      <ul v-if="(items.length > 0)">
-        <list-item
-          v-for="item in items"
-          v-bind:key="item.id"
-          v-bind:item="item"
-          @done-item="doneItem"
-          @edit-item="editItem"
-          @delete-item="deleteItem"
-        />
-      </ul>
-      <p v-if="(items.length <= 0)">Todo list is empty.</p>
-    </template>
-    <p v-if="(!itemsRetrieved)">Loading todos...</p>
-    <p style="color: red">{{errorMsg}}</p>
+    <ul>
+      <list-item
+        v-for="(item, index) in items"
+        v-bind:key="index"
+        v-bind:item="item"
+        v-bind:day="dayIn"
+        v-bind:allowEdit="allowEditIn"
+        @edit-item="editItem"
+      />
+    </ul>
   </div>
 </template>
 
@@ -31,116 +22,32 @@ export default {
   components: {
     ListItem
   },
+  props: {
+    itemsIn: { type: Array },
+    dayIn: { type: Number },
+    allowEditIn: { type: Boolean }
+  },
   data() {
     return {
-      items: [],
-      addTodoMsg: "",
-      errorMsg: "",
-      itemsRetrieved: false,
+      items: this.itemsIn,
       userId: Settings.get(Key.UserId)
     };
   },
-  beforeMount() {
-    this.loadItems();
-  },
   methods: {
     handleError(error) {
-      this.errorMsg = error;
-      this.itemsRetrieved = true;
-      var noAuthStr = "Not Authorised!";
-      if (String(error).match(noAuthStr + "$") == noAuthStr) {
-        Settings.set(Key.AuthToken, null);
-        this.errorMsg +=
-          " Logged out from the session. You will be redirected to the login page in a few seconds.";
-        setTimeout(() => {
-          this.$emit("toggle-logged-in");
-        }, 5000);
-      }
-    },
-    loadItems() {
-      this.errorMsg = "";
-      this.$apollo
-        .query({
-          query: require("../graphql/getAssignedListItems.gql"),
-          variables: {
-            assigneeID: this.userId
-          }
-        })
-        .then(result => {
-          this.items = result.data.getAssignedListItems;
-          this.itemsRetrieved = true;
-          this.$nextTick(() => {
-            this.$refs.addTodoMsg.focus();
-          });
-        })
-        .catch(error => {
-          this.handleError(error);
-        });
-    },
-    addItem() {
-      if (this.addTodoMsg.length <= 0) return;
-      //ui
-      var addTodoMsgTemp = this.addTodoMsg;
-      this.addTodoMsg = "";
-      //db
-      this.errorMsg = "";
-      this.$apollo
-        .mutate({
-          mutation: require("../graphql/createListItem.gql"),
-          variables: {
-            message: addTodoMsgTemp,
-            assigneeID: this.userId
-          }
-        })
-        .then(result => {
-          const item = result.data.createListItem;
-          //ui
-          this.items.push(item);
-        })
-        .catch(error => {
-          this.handleError(error);
-        });
-    },
-    doneItem(item) {
-      //db
-      this.errorMsg = "";
-      this.$apollo
-        .mutate({
-          mutation: require("../graphql/finishListItem.gql"),
-          variables: {
-            id: item.id
-          }
-        })
-        .catch(error => {
-          this.handleError(error);
-        });
+      this.$emit("handle-error", "[Wage Item Data] " + error);
     },
     editItem(item) {
-      //db
+      this.$emit("update-year");
+      this.$emit("calculate-wage");
       this.errorMsg = "";
       this.$apollo
         .mutate({
-          mutation: require("../graphql/updateListItem.gql"),
+          mutation: require("../graphql/setWorkAndDuration.gql"),
           variables: {
-            id: item.id,
-            userId: this.userId,
-            message: item.message
-          }
-        })
-        .catch(error => {
-          this.handleError(error);
-        });
-    },
-    deleteItem(item) {
-      //ui
-      this.items = this.items.filter(i => i.id !== item.id);
-      //db
-      this.errorMsg = "";
-      this.$apollo
-        .mutate({
-          mutation: require("../graphql/deleteListItem.gql"),
-          variables: {
-            id: item.id
+            work: item.work,
+            duration: Number(item.duration),
+            userId: this.userId
           }
         })
         .catch(error => {

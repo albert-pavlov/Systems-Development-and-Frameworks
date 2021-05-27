@@ -1,7 +1,8 @@
 export const Key = Object.freeze({
   AuthToken: "global-auth-token",
   UserId: "global-user-id",
-  UserName: "global-user-name"
+  UserName: "global-user-name",
+  UserWage: "global-user-wage"
 });
 
 export var Settings = {
