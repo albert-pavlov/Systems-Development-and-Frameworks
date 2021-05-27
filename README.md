@@ -3,6 +3,6 @@
 
 | Github Alias                                         | Name         |
 | ---------------------------------------------------- | ------------ |
-| [@albert-pavlov](https://github.com/albert-pavlov)   | Albert P.    |
+| [@notpavlov](https://github.com/notpavlov)           | A. P.        |
 | [@veselinodjov](https://github.com/veselinodjov)     | Veselin O.   |
 | [@idsider](https://github.com/idsider)               | David S.     |
