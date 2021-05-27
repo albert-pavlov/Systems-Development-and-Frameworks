@@ -1,17 +1,17 @@
 # Backend
 
 ## Project setup
+
 ```
-npm install
+yarn install
 ```
 
-## Compiles and hot-reloads for development
+## Preps the database and compiles the app
 ```
-npm start
-```
-
-## Run tests with Jest
-```
-npm test (not implemented yet)
+clear ; yarn run db:reset ; yarn run db:seed ; yarn run start
 ```
 
+## Preps the database and runs tests with Jest
+```
+clear ; yarn run db:reset ; yarn run db:seed ; yarn run test
+```

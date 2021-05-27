@@ -1,24 +1,30 @@
 {
   "name": "backend",
   "version": "1.0.0",
-  "description": "<!DOCTYPE html> <html lang=\"en\">   <head>     <meta charset=\"utf-8\">   <link rel=\"dns-prefetch\" href=\"https://github.githubassets.com\">   <link rel=\"dns-prefetch\" href=\"https://avatars0.githubusercontent.com\">   <link rel=\"dns-prefetch\" href=\"https://avatars1.githubusercontent.com\">   <link rel=\"dns-prefetch\" href=\"https://avatars2.githubusercontent.com\">   <link rel=\"dns-prefetch\" href=\"https://avatars3.githubusercontent.com\">   <link rel=\"dns-prefetch\" href=\"https://github-cloud.s3.amazonaws.com\">   <link rel=\"dns-prefetch\" href=\"https://user-images.githubusercontent.com/\">",
   "main": "src/index.js",
   "scripts": {
     "start": "node src/index",
-    "test": "jest"
+    "test": "jest",
+    "db:reset": "node src/db/reset",
+    "db:seed": "node src/db/seed"
   },
   "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "author": "A.Pavlov / V.Odzhov",
+  "license": "MIT",
   "dependencies": {
     "apollo-server": "^2.9.8",
-    "apollo-server-testing": "^2.9.9",
+    "babel-install": "^2.1.0",
+    "dotenv": "^8.2.0",
     "eslint": "^6.6.0",
     "fs": "0.0.1-security",
     "graphql": "^14.5.8",
     "graphql-middleware": "^4.0.2",
     "graphql-shield": "^7.0.2",
-    "jest": "^24.9.0",
-    "jsonwebtoken": "^8.5.1"
+    "jsonwebtoken": "^8.5.1",
+    "neo4j-driver": "^4.0.0"
+  },
+  "devDependencies": {
+    "apollo-server-testing": "^2.9.13",
+    "jest": "^24.9.0"
   }
 }

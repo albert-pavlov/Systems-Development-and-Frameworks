@@ -1,15 +1,6 @@
 module.exports = {
-    generateRandomId: function (arr) {
-        let largestId = 0;
-
-        for (i = 0; i < arr.length; i++) {
-            if (arr[i].id > largestId) {
-                largestId = arr[i].id;
-            }
-        }
-        largestId += Math.floor(Math.random() * arr.length+1);
-
-        return largestId;
+    generateRandomId: function (id) {
+        return  (id + Math.floor(Math.random() * 10) + 1);
     },
     sortListItemsByOrder: function (arr, orderBy) {
         let newArr = JSON.parse(JSON.stringify(arr));
